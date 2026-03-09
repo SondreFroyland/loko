@@ -1,0 +1,3665 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LØKO</title>
+    <style>
+        /* ============================================
+           RESET OG GRUNNSTILER
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+            line-height: 1.5;
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* ============================================
+           MENY / STARTSIDE
+           ============================================ */
+        #menu {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 16px;
+            text-align: center;
+        }
+
+        #menu h1 {
+            font-size: 3rem;
+            color: #1e40af;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+
+        #menu .menu-subtitle {
+            font-size: 1.15rem;
+            color: #64748b;
+            margin-bottom: 36px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .theme-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 24px 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+        }
+
+
+        .theme-card.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .theme-icon {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .theme-card h3 {
+            font-size: 1.05rem;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .theme-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Modusvelger */
+        .mode-section {
+            margin-bottom: 32px;
+        }
+
+        .mode-section h3 {
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .mode-options {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .mode-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 28px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            min-width: 160px;
+        }
+
+
+        .mode-card.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .mode-card .mode-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .mode-card h4 {
+            font-size: 1rem;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+
+        .mode-card p {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Lisensskjerm */
+        .license-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .license-screen.hidden {
+            display: none;
+        }
+
+        .license-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .license-box h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+        }
+
+        .license-box .license-subtitle {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+
+        .license-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+            text-transform: uppercase;
+        }
+
+        .license-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .license-input.error {
+            border-color: #ef4444;
+        }
+
+        .license-input.success {
+            border-color: #22c55e;
+        }
+
+        .license-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            min-height: 22px;
+            margin-top: 8px;
+        }
+
+        .license-success {
+            color: #22c55e;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 22px;
+            margin-top: 8px;
+        }
+
+        .license-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 12px 48px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background: #2563eb;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+
+        .license-buy-link {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .license-buy-link a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+
+        /* Spillkode */
+        .game-code-section {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .game-code-divider {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .game-code-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .game-code-input-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .game-code-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .game-code-input-row input:focus {
+            border-color: #3b82f6;
+        }
+
+        .game-code-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .game-code-banner {
+            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1rem;
+        }
+
+        .game-code-banner.hidden {
+            display: none;
+        }
+
+        .game-code-banner strong {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+        }
+
+        .copy-code-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+
+        /* Tema-editor */
+        .custom-theme-editor {
+            position: fixed;
+            inset: 0;
+            background: #f0f4f8;
+            z-index: 400;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .custom-theme-editor.hidden {
+            display: none;
+        }
+
+        .editor-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .editor-header h2 {
+            font-size: 1.5rem;
+            color: #1e3a8a;
+        }
+
+        .editor-form label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 6px;
+            margin-top: 16px;
+        }
+
+        .editor-form label:first-child {
+            margin-top: 0;
+        }
+
+        .editor-name-input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .editor-name-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #fff;
+        }
+
+
+        .emoji-option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+
+        .pairs-header {
+            display: grid;
+            grid-template-columns: 30px 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .pairs-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pair-row {
+            display: grid;
+            grid-template-columns: 30px 1fr 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pair-num {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .pair-input {
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .pair-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .pair-input.error {
+            border-color: #ef4444;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .editor-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .theme-card-actions {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .theme-card {
+            position: relative;
+        }
+
+        .theme-edit-btn,
+        .theme-delete-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.05);
+            transition: background 0.15s;
+        }
+
+
+        /* Passord-modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-box h3 {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .modal-box .modal-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .modal-box input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .modal-box input[type="password"]:focus {
+            border-color: #3b82f6;
+        }
+
+        .modal-box .modal-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            min-height: 20px;
+            margin-bottom: 8px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-primary {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .modal-btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+
+        .change-password-link {
+            font-size: 0.8rem;
+            color: #64748b;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 6px;
+            display: inline-block;
+        }
+
+
+        /* Vanskelighetsgrad-velger */
+        .difficulty-section {
+            display: none;
+            margin-top: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .difficulty-section.visible {
+            display: block;
+        }
+
+        .difficulty-section h3 {
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .difficulty-options {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .diff-btn {
+            padding: 10px 24px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+
+
+        .diff-btn.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .start-btn {
+            margin-top: 28px;
+            padding: 14px 48px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #3b82f6;
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+
+
+        .start-btn:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        /* ============================================
+           LAYOUT (SPILL)
+           ============================================ */
+        #app {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 24px 16px 48px;
+            display: none;
+        }
+
+        #app.visible {
+            display: block;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .back-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.9rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+
+        header h1 {
+            font-size: 2.4rem;
+            color: #1e40af;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .instructions {
+            font-size: 0.95rem;
+            color: #475569;
+            font-style: italic;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           SPILLKOLONNER
+           ============================================ */
+        .game-columns {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .column {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .column h2 {
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* ============================================
+           SPILLELEMENTER (oppgaver og svar)
+           ============================================ */
+        .item {
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+            background: #fff;
+            font-size: 0.95rem;
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .item.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+        }
+
+        .item.matched {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .item.correct {
+            border-color: #22c55e;
+            background: #dcfce7;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .item.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+            animation: shake 0.4s ease;
+        }
+
+        .item.disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .item.locked {
+            border-color: #22c55e;
+            background: #dcfce7;
+            cursor: default;
+            opacity: 0.75;
+        }
+
+        .match-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .item-text {
+            flex: 1;
+        }
+
+        .result-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+           MATCHLISTE
+           ============================================ */
+        .matches-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+
+        .matches-section h2 {
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .match-count {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 6px;
+        }
+
+        .match-entry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #f8fafc;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .match-entry .match-badge-small {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .match-entry .match-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .match-entry .match-arrow {
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .match-entry .remove-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.1rem;
+            min-width: 32px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+
+        .match-entry.correct {
+            background: #dcfce7;
+        }
+
+        .match-entry.incorrect {
+            background: #fee2e2;
+        }
+
+        .no-matches {
+            text-align: center;
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+
+        /* ============================================
+           LØKO-RUTENETT
+           ============================================ */
+        .loko-section {
+            margin-bottom: 24px;
+        }
+
+        .loko-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .loko-grid-wrapper {
+            text-align: center;
+        }
+
+        .loko-grid-wrapper h3 {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loko-grid {
+            display: grid;
+            grid-template-columns: repeat(3, clamp(48px, 8vw, 72px));
+            grid-template-rows: repeat(4, clamp(48px, 8vw, 72px));
+            gap: 4px;
+        }
+
+        .brick {
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .brick.empty {
+            background: #f1f5f9;
+        }
+
+        .brick.filled {
+            border-color: #cbd5e1;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        /* ============================================
+           BILDEOPPLASTING
+           ============================================ */
+        .image-picker-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .image-thumb {
+            width: 48px;
+            height: 64px;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-size: cover;
+            background-position: center;
+        }
+
+
+        .image-thumb.active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+        }
+
+        .image-upload-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .upload-btn {
+            padding: 6px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            color: #475569;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+
+        /* ============================================
+           KNAPPER
+           ============================================ */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+
+        .btn-primary:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+
+        /* ============================================
+           RESULTAT OG MELDINGER
+           ============================================ */
+        .result-area {
+            text-align: center;
+            min-height: 40px;
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .result-message.perfect {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .result-message.good {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .result-message.poor {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .retry-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            background: #3b82f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+
+        .all-matched-message {
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.95rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* ============================================
+           KONFETTI-CANVAS
+           ============================================ */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* ============================================
+           ANIMASJONER
+           ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        @keyframes brickAppear {
+            from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            to { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .brick.just-placed {
+            animation: brickAppear 0.35s ease;
+        }
+
+        /* ============================================
+           RESPONSIVT DESIGN
+           ============================================ */
+        @media (max-width: 640px) {
+            #menu {
+                padding: 32px 12px;
+            }
+
+            #menu h1 {
+                font-size: 2.2rem;
+            }
+
+            .theme-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .theme-card {
+                padding: 18px 12px;
+            }
+
+            .theme-icon {
+                font-size: 2rem;
+            }
+
+            #app {
+                padding: 16px 10px 40px;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .game-columns {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .column {
+                padding: 12px;
+            }
+
+            .matches-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .loko-container {
+                gap: 24px;
+            }
+
+            .loko-grid {
+                grid-template-columns: repeat(3, 48px);
+                grid-template-rows: repeat(4, 48px);
+            }
+
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                text-align: center;
+            }
+
+            .difficulty-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .license-box {
+                padding: 32px 24px;
+            }
+        }
+
+        /* ============================================
+           TABLET BREAKPOINT (iPad portrait)
+           ============================================ */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #menu { padding: 36px 20px; }
+            .theme-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            .game-columns { gap: 16px; }
+            .loko-grid {
+                grid-template-columns: repeat(3, 64px);
+                grid-template-rows: repeat(4, 64px);
+                gap: 5px;
+            }
+            .item { padding: 12px 16px; font-size: 1rem; }
+            .editor-container { padding: 24px; }
+        }
+
+        /* iPad landscape / store nettbrett */
+        @media (min-width: 1025px) and (max-width: 1366px) {
+            #app { max-width: 1000px; }
+            .game-columns { gap: 24px; }
+            .loko-grid {
+                grid-template-columns: repeat(3, 72px);
+                grid-template-rows: repeat(4, 72px);
+            }
+        }
+
+        /* Tastatur synlig (kort viewport) */
+        @media (max-height: 500px) {
+            .license-box { padding: 20px 16px; }
+            .license-box h1 { font-size: 2rem; }
+        }
+
+        /* ============================================
+           HOVER-STILER (kun mus/trackpad)
+           ============================================ */
+        @media (hover: hover) {
+            .theme-card:hover {
+                border-color: #93c5fd;
+                background: #eff6ff;
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(59,130,246,0.12);
+            }
+            .mode-card:hover {
+                border-color: #93c5fd;
+                background: #eff6ff;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 14px rgba(59,130,246,0.1);
+            }
+            .license-btn:hover { background: #1d4ed8; }
+            .copy-code-btn:hover { background: rgba(255, 255, 255, 0.35); }
+            .emoji-option:hover { border-color: #93c5fd; background: #eff6ff; }
+            .theme-edit-btn:hover { background: rgba(59, 130, 246, 0.15); }
+            .theme-delete-btn:hover { background: rgba(239, 68, 68, 0.15); }
+            .modal-btn-primary:hover { background: #2563eb; }
+            .modal-btn-secondary:hover { background: #cbd5e1; }
+            .change-password-link:hover { color: #3b82f6; }
+            .diff-btn:hover { border-color: #93c5fd; background: #eff6ff; }
+            .start-btn:hover:not(:disabled) { background: #2563eb; transform: translateY(-1px); }
+            .back-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+            .item:hover:not(.disabled) { border-color: #93c5fd; background: #eff6ff; }
+            .match-entry .remove-btn:hover { color: #ef4444; }
+            .image-thumb:hover { border-color: #93c5fd; transform: scale(1.08); }
+            .upload-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+            .btn-primary:hover:not(:disabled) { background: #2563eb; }
+            .btn-secondary:hover { background: #cbd5e1; }
+            .retry-btn:hover { background: #1d4ed8; }
+        }
+
+        /* ============================================
+           TOUCH-FEEDBACK OG TILGJENGELIGHET
+           ============================================ */
+        .theme-card, .mode-card, .item, .btn, .diff-btn, .start-btn,
+        .back-btn, .retry-btn, .emoji-option, .image-thumb, .upload-btn,
+        .match-entry .remove-btn, .theme-edit-btn, .theme-delete-btn,
+        .license-btn, .copy-code-btn, .modal-btn-primary, .modal-btn-secondary {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .theme-card:active { transform: scale(0.97); }
+        .mode-card:active { transform: scale(0.97); }
+        .item:active:not(.disabled) { transform: scale(0.98); background: #dbeafe; }
+        .btn:active { transform: scale(0.96); }
+        .diff-btn:active { transform: scale(0.97); }
+        .start-btn:active:not(:disabled) { transform: scale(0.97); }
+        .back-btn:active { transform: scale(0.97); }
+        .license-btn:active { transform: scale(0.96); }
+        .retry-btn:active { transform: scale(0.96); }
+        .emoji-option:active { transform: scale(0.93); }
+
+        /* ============================================
+           FORBEDRET SELECTED-HIGHLIGHT
+           ============================================ */
+        .item.selected::after {
+            content: '\2192';
+            font-size: 1.2rem;
+            color: #3b82f6;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+           FREMDRIFTSLINJE
+           ============================================ */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #22c55e);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        /* ============================================
+           HJELPETEKST FOR SJEKK-KNAPP
+           ============================================ */
+        .check-helper {
+            display: block;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+            text-align: center;
+            transition: opacity 0.3s;
+        }
+
+        /* ============================================
+           TOAST-MELDINGER
+           ============================================ */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============================================
+           INNGANGSANIMASJON
+           ============================================ */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================
+     LISENSSKJERM
+     ============================================ -->
+<div class="license-screen" id="license-screen">
+    <div class="license-box">
+        <h1>LØKO</h1>
+        <p class="license-subtitle">Skriv inn din lisenskode for å aktivere spillet</p>
+        <input type="text" id="license-input" placeholder="LOKO-XXXXX-XXXXX-XXXXX" autocomplete="off" maxlength="22">
+        <p class="license-error" id="license-error">&nbsp;</p>
+        <p class="license-success hidden" id="license-success"></p>
+        <button class="license-btn" id="license-activate-btn">Aktiver</button>
+        <p class="license-buy-link">Har du ikke en kode? <a href="https://sondrefox.gumroad.com/l/vyiyty" target="_blank">Kjøp her</a></p>
+    </div>
+</div>
+
+<!-- ============================================
+     MENY / STARTSIDE
+     ============================================ -->
+<div id="menu">
+    <h1>LØKO</h1>
+    <p class="menu-subtitle">Velg modus og tema for å starte spillet</p>
+
+    <div class="mode-section">
+        <h3>Hvem er du?</h3>
+        <div class="mode-options" id="mode-options"></div>
+    </div>
+
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <div class="difficulty-section" id="difficulty-section">
+        <h3>Vanskelighetsgrad</h3>
+        <div class="difficulty-options" id="difficulty-options"></div>
+    </div>
+
+    <button class="start-btn" id="start-btn" disabled>Start spill</button>
+
+    <div class="game-code-section">
+        <p class="game-code-divider">— eller —</p>
+        <p class="game-code-label">Har du en spillkode?</p>
+        <p style="font-size:0.8rem;color:#94a3b8;margin-bottom:8px;">Lim inn koden du fikk fra læreren din her</p>
+        <div class="game-code-input-row">
+            <input type="text" id="game-code-input" placeholder="XXX-XXXX" maxlength="500" autocomplete="off">
+            <button class="btn btn-primary" id="join-game-btn">Spill</button>
+        </div>
+        <p class="game-code-error hidden" id="game-code-error"></p>
+    </div>
+</div>
+
+<!-- ============================================
+     SPILLSKJERM
+     ============================================ -->
+<div id="app">
+    <div class="game-code-banner hidden" id="game-code-banner">
+        <span>Spillkode: <strong id="game-code-display"></strong></span>
+        <button class="copy-code-btn" id="copy-code-btn" title="Kopier kode">📋</button>
+    </div>
+    <header>
+        <div class="back-row">
+            <button class="back-btn" id="back-btn">&#8592; Velg tema</button>
+        </div>
+        <h1>LØKO</h1>
+        <p class="subtitle" id="game-subtitle"></p>
+        <p class="instructions" id="game-instructions">Trykk på en oppgave, deretter på riktig svar for å lage en match.</p>
+    </header>
+
+    <section class="game-columns" aria-label="Spillområde">
+        <div class="column">
+            <h2>Oppgaver</h2>
+            <div id="questions-list" role="list"></div>
+        </div>
+        <div class="column">
+            <h2>Svar</h2>
+            <div id="answers-list" role="list"></div>
+        </div>
+    </section>
+
+    <section class="matches-section" aria-label="Dine matcher">
+        <h2>Dine matcher <span class="match-count" id="match-count">(0 / 12)</span></h2>
+        <div id="matches-list"></div>
+        <div class="result-area" id="all-matched-msg"></div>
+    </section>
+
+    <section class="loko-section" aria-label="LØKO-kontrollmønster">
+        <div class="loko-container">
+            <div class="loko-grid-wrapper">
+                <h3>Ditt mønster</h3>
+                <div class="loko-grid" id="user-grid"></div>
+            </div>
+            <div class="loko-grid-wrapper">
+                <h3>Fasitmønster</h3>
+                <div class="loko-grid" id="ref-grid"></div>
+            </div>
+        </div>
+        <div class="image-picker-row" id="image-picker-row"></div>
+        <div class="image-upload-row">
+            <button class="upload-btn" id="upload-btn">Last opp eget bilde</button>
+            <input type="file" id="image-input" accept="image/*" hidden>
+        </div>
+    </section>
+
+    <div class="actions">
+        <button class="btn btn-primary" id="check-btn" disabled>Sjekk svar</button>
+        <button class="btn btn-secondary" id="reset-btn">Nullstill</button>
+    </div>
+    <p class="check-helper" id="check-helper">Match alle 12 oppgaver for å sjekke svar</p>
+
+    <div class="result-area" id="result-area"></div>
+</div>
+
+<!-- Passord-modal -->
+<div class="modal-overlay hidden" id="password-modal">
+    <div class="modal-box">
+        <h3 id="modal-title">Sett passord</h3>
+        <p class="modal-desc" id="modal-desc">Lag et passord for lærermodus</p>
+        <input type="password" id="modal-password" placeholder="Skriv passord" autocomplete="off">
+        <input type="password" id="modal-password-confirm" placeholder="Bekreft passord" autocomplete="off">
+        <p class="modal-error" id="modal-error"></p>
+        <div class="modal-buttons">
+            <button class="modal-btn-secondary" id="modal-cancel-btn">Avbryt</button>
+            <button class="modal-btn-primary" id="modal-ok-btn">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tema-editor -->
+<div class="custom-theme-editor hidden" id="custom-theme-editor">
+    <div class="editor-container">
+        <div class="editor-header">
+            <h2 id="editor-title">Lag eget tema</h2>
+            <button class="back-btn" id="editor-back-btn">&larr; Tilbake</button>
+        </div>
+        <div class="editor-form">
+            <label>Temanavn</label>
+            <input type="text" class="editor-name-input" id="editor-theme-name" placeholder="F.eks. Engelsk ordforråd" maxlength="40">
+
+            <label>Velg ikon</label>
+            <div class="emoji-picker" id="emoji-picker"></div>
+
+            <label>Oppgaver og svar (12 par)</label>
+            <div class="pairs-header">
+                <span>#</span>
+                <span>Spørsmål</span>
+                <span>Svar</span>
+            </div>
+            <div class="pairs-grid" id="pairs-grid"></div>
+            <p class="editor-error" id="editor-error"></p>
+        </div>
+        <div class="editor-actions">
+            <button class="btn btn-secondary" id="editor-cancel-btn">Avbryt</button>
+            <button class="btn btn-primary" id="editor-save-btn">Lagre tema</button>
+        </div>
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// ============================================
+// LISENSHÅNDTERING
+// ============================================
+
+const LICENSE_STORAGE_KEY = 'loko_license';
+const _C = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const _S = [83,107,48,108,101,70,106,111,114,76,79,75,79].map(c => String.fromCharCode(c)).join('');
+
+function _computeChecksum(base) {
+    let h = 0x5F3A1B;
+    for (let i = 0; i < base.length; i++) {
+        h = ((h << 5) - h + base.charCodeAt(i) + _S.charCodeAt(i % _S.length)) | 0;
+        h = ((h >>> 0) * 0x45D9F3B) >>> 0;
+    }
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+        h = ((h * 0x41C64E6D + 0x3039) >>> 0);
+        result += _C[(h >>> 16) % _C.length];
+    }
+    return result;
+}
+
+function validateLicenseKey(key) {
+    const clean = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (clean.length !== 19) return false;
+    if (clean.substring(0, 4) !== 'LOKO') return false;
+    const base = clean.substring(4, 14);
+    const check = clean.substring(14, 19);
+    for (let i = 0; i < base.length; i++) {
+        if (_C.indexOf(base[i]) === -1) return false;
+    }
+    return _computeChecksum(base) === check;
+}
+
+function generateLicenseKey() {
+    let base = '';
+    for (let i = 0; i < 10; i++) {
+        base += _C[Math.floor(Math.random() * _C.length)];
+    }
+    const check = _computeChecksum(base);
+    return 'LOKO-' + base.substring(0, 5) + '-' + base.substring(5, 10) + '-' + check;
+}
+
+function getStoredLicense() {
+    return localStorage.getItem(LICENSE_STORAGE_KEY);
+}
+
+function setStoredLicense(key) {
+    localStorage.setItem(LICENSE_STORAGE_KEY, key);
+}
+
+function checkLicense() {
+    const licenseScreen = document.getElementById('license-screen');
+    const menuEl = document.getElementById('menu');
+    const stored = getStoredLicense();
+
+    if (stored && validateLicenseKey(stored)) {
+        licenseScreen.classList.add('hidden');
+        menuEl.style.display = '';
+    } else {
+        licenseScreen.classList.remove('hidden');
+        menuEl.style.display = 'none';
+    }
+}
+
+function activateLicense() {
+    const input = document.getElementById('license-input');
+    const errorEl = document.getElementById('license-error');
+    const successEl = document.getElementById('license-success');
+    const key = input.value.trim();
+
+    errorEl.textContent = '\u00A0';
+    errorEl.classList.remove('hidden');
+    successEl.classList.add('hidden');
+    input.classList.remove('error', 'success');
+
+    if (!key) {
+        errorEl.textContent = 'Skriv inn en lisenskode';
+        input.classList.add('error');
+        return;
+    }
+
+    if (validateLicenseKey(key)) {
+        setStoredLicense(key);
+        input.classList.add('success');
+        errorEl.classList.add('hidden');
+        successEl.textContent = 'Lisens aktivert!';
+        successEl.classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('license-screen').classList.add('hidden');
+            document.getElementById('menu').style.display = '';
+        }, 1000);
+    } else {
+        errorEl.textContent = 'Ugyldig lisenskode';
+        input.classList.add('error');
+    }
+}
+
+// Formatering av lisenskode-input
+function formatLicenseInput(e) {
+    const input = e.target;
+    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+    // Legg til LOKO-prefix automatisk hvis brukeren ikke har skrevet det
+    if (val.length > 0 && !val.startsWith('LOKO')) {
+        // Sjekk om de skriver starten av LOKO
+        const lokoPrefix = 'LOKO';
+        let isTypingLoko = true;
+        for (let i = 0; i < Math.min(val.length, 4); i++) {
+            if (val[i] !== lokoPrefix[i]) { isTypingLoko = false; break; }
+        }
+        if (!isTypingLoko) {
+            val = 'LOKO' + val;
+        }
+    }
+
+    // Begrens til 19 tegn (LOKO + 15 tegn)
+    if (val.length > 19) val = val.substring(0, 19);
+
+    // Formater med bindestreker: LOKO-XXXXX-XXXXX-XXXXX
+    let formatted = '';
+    for (let i = 0; i < val.length; i++) {
+        if (i === 4 || i === 9 || i === 14) formatted += '-';
+        formatted += val[i];
+    }
+
+    input.value = formatted;
+}
+
+// Event listeners for lisensskjerm
+document.getElementById('license-activate-btn').addEventListener('click', activateLicense);
+document.getElementById('license-input').addEventListener('input', formatLicenseInput);
+document.getElementById('license-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') activateLicense();
+});
+
+// ============================================
+// SPILLKODE-SYSTEM (Seeded PRNG)
+// ============================================
+
+let rng = Math.random;
+
+function mulberry32(seed) {
+    return function() {
+        seed |= 0;
+        seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+}
+
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const BUILTIN_THEME_IDS = ['capitals', 'addition', 'subtraction', 'multiplication', 'division', 'antonyms', 'counties'];
+
+function encodeGameCode(themeIndex, difficultyId, seed) {
+    const diffIndex = difficulties.findIndex(d => d.id === difficultyId);
+    const di = diffIndex >= 0 ? diffIndex : 0;
+    const combo = themeIndex * 5 + di;
+
+    let code = '';
+    code += CODE_CHARS[Math.floor(combo / 30)];
+    code += CODE_CHARS[combo % 30];
+
+    let s = seed;
+    for (let i = 0; i < 5; i++) {
+        code += CODE_CHARS[s % 30];
+        s = Math.floor(s / 30);
+    }
+    return code.substring(0, 3) + '-' + code.substring(3);
+}
+
+function decodeGameCode(code) {
+    const clean = code.replace(/[-\s]/g, '').toUpperCase();
+    if (clean.length !== 7) return null;
+
+    const c0 = CODE_CHARS.indexOf(clean[0]);
+    const c1 = CODE_CHARS.indexOf(clean[1]);
+    if (c0 < 0 || c1 < 0) return null;
+
+    const combo = c0 * 30 + c1;
+    const themeIndex = Math.floor(combo / 5);
+    const diffIndex = combo % 5;
+
+    if (themeIndex < 0 || themeIndex >= BUILTIN_THEME_IDS.length) return null;
+    if (diffIndex < 0 || diffIndex >= difficulties.length) return null;
+
+    let seed = 0;
+    let mult = 1;
+    for (let i = 2; i < 7; i++) {
+        const ci = CODE_CHARS.indexOf(clean[i]);
+        if (ci < 0) return null;
+        seed += ci * mult;
+        mult *= 30;
+    }
+
+    return {
+        themeId: BUILTIN_THEME_IDS[themeIndex],
+        difficultyId: difficulties[diffIndex].id,
+        seed: seed
+    };
+}
+
+function encodeCustomGameCode(customTheme, seed) {
+    const data = {
+        n: customTheme.name,
+        i: customTheme.icon,
+        p: customTheme.pairs.map(p => [p.question, p.answer]),
+        s: seed
+    };
+    const json = JSON.stringify(data);
+    const b64 = btoa(unescape(encodeURIComponent(json)));
+    return 'C-' + b64;
+}
+
+function decodeCustomGameCode(code) {
+    if (!code.startsWith('C-')) return null;
+    try {
+        const b64 = code.substring(2);
+        const json = decodeURIComponent(escape(atob(b64)));
+        const data = JSON.parse(json);
+        return {
+            name: data.n,
+            icon: data.i,
+            pairs: data.p.map(([q, a]) => ({ question: q, answer: a })),
+            seed: data.s
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+// ============================================
+// TEMADATA
+// ============================================
+
+const themes = [
+    {
+        id: 'capitals',
+        name: 'Hovedsteder i Europa',
+        icon: '🌍',
+        description: '12 land og hovedsteder',
+        hasDifficulty: false,
+        generate: () => [
+            { question: 'Norge',         answer: 'Oslo' },
+            { question: 'Sverige',       answer: 'Stockholm' },
+            { question: 'Danmark',       answer: 'København' },
+            { question: 'Finland',       answer: 'Helsinki' },
+            { question: 'Island',        answer: 'Reykjavik' },
+            { question: 'Tyskland',      answer: 'Berlin' },
+            { question: 'Frankrike',     answer: 'Paris' },
+            { question: 'Spania',        answer: 'Madrid' },
+            { question: 'Italia',        answer: 'Roma' },
+            { question: 'Portugal',      answer: 'Lisboa' },
+            { question: 'Polen',         answer: 'Warszawa' },
+            { question: 'Storbritannia', answer: 'London' },
+        ],
+    },
+    {
+        id: 'addition',
+        name: 'Addisjon',
+        icon: '➕',
+        description: 'Pluss-regnestykker',
+        hasDifficulty: true,
+        generate: (diff) => generateMathQuiz('+', diff),
+    },
+    {
+        id: 'subtraction',
+        name: 'Subtraksjon',
+        icon: '➖',
+        description: 'Minus-regnestykker',
+        hasDifficulty: true,
+        generate: (diff) => generateMathQuiz('−', diff),
+    },
+    {
+        id: 'multiplication',
+        name: 'Multiplikasjon',
+        icon: '✖️',
+        description: 'Gange-regnestykker',
+        hasDifficulty: true,
+        generate: (diff) => generateMathQuiz('×', diff),
+    },
+    {
+        id: 'division',
+        name: 'Divisjon',
+        icon: '➗',
+        description: 'Dele-regnestykker',
+        hasDifficulty: true,
+        generate: (diff) => generateMathQuiz('÷', diff),
+    },
+    {
+        id: 'antonyms',
+        name: 'Antonymer',
+        icon: '🔄',
+        description: 'Finn motsetningsordet',
+        hasDifficulty: false,
+        generate: () => shuffleArray([
+            { question: 'Stor',    answer: 'Liten' },
+            { question: 'Varm',    answer: 'Kald' },
+            { question: 'Lys',     answer: 'Mørk' },
+            { question: 'Rask',    answer: 'Treg' },
+            { question: 'Glad',    answer: 'Trist' },
+            { question: 'Ung',     answer: 'Gammel' },
+            { question: 'Lett',    answer: 'Tung' },
+            { question: 'Lang',    answer: 'Kort' },
+            { question: 'Rik',     answer: 'Fattig' },
+            { question: 'Sterk',   answer: 'Svak' },
+            { question: 'Våt',     answer: 'Tørr' },
+            { question: 'Modig',   answer: 'Feig' },
+        ]).slice(0, 12),
+    },
+    {
+        id: 'counties',
+        name: 'Norske fylker',
+        icon: '🇳🇴',
+        description: 'Koble fylke til riktig by',
+        hasDifficulty: false,
+        generate: () => [
+            { question: 'Oslo',              answer: 'Oslo' },
+            { question: 'Rogaland',          answer: 'Stavanger' },
+            { question: 'Vestland',          answer: 'Bergen' },
+            { question: 'Møre og Romsdal',   answer: 'Molde' },
+            { question: 'Trøndelag',         answer: 'Steinkjer' },
+            { question: 'Nordland',          answer: 'Bodø' },
+            { question: 'Troms',             answer: 'Tromsø' },
+            { question: 'Finnmark',          answer: 'Vadsø' },
+            { question: 'Innlandet',         answer: 'Hamar' },
+            { question: 'Viken',             answer: 'Drammen' },
+            { question: 'Vestfold',          answer: 'Tønsberg' },
+            { question: 'Agder',             answer: 'Kristiansand' },
+        ],
+    },
+];
+
+// ============================================
+// EGENDEFINERTE TEMAER
+// ============================================
+
+const CUSTOM_THEMES_KEY = 'loko_custom_themes';
+const EMOJI_OPTIONS = ['📚', '🎯', '🌟', '💡', '🎨', '🎵', '🔬', '📐', '🌍', '🧪', '🎲', '🏆'];
+
+function getCustomThemes() {
+    const stored = localStorage.getItem(CUSTOM_THEMES_KEY);
+    return stored ? JSON.parse(stored) : [];
+}
+
+function saveCustomThemes(list) {
+    localStorage.setItem(CUSTOM_THEMES_KEY, JSON.stringify(list));
+}
+
+function getAllThemes() {
+    const custom = getCustomThemes().map(ct => ({
+        id: ct.id,
+        name: ct.name,
+        icon: ct.icon,
+        description: `${ct.pairs.length} egne oppgaver`,
+        hasDifficulty: false,
+        isCustom: true,
+        generate: () => [...ct.pairs],
+    }));
+    return [...themes, ...custom];
+}
+
+const difficulties = [
+    { id: 'easy',    label: 'Lett',         description: 'Tall 1–10' },
+    { id: 'medium',  label: 'Middels',      description: 'Tall 1–20' },
+    { id: 'hard',    label: 'Vanskelig',    description: 'Tall 1–50' },
+    { id: 'vhard',   label: 'Ekstra',       description: 'Tall 50–100' },
+    { id: 'extreme', label: 'Utfordrende',  description: 'Tall 100–1000' },
+];
+
+// ============================================
+// MATTEGENERATOR
+// ============================================
+
+function getDiffRange(diff) {
+    if (diff === 'easy')    return { min: 1,   max: 10 };
+    if (diff === 'medium')  return { min: 1,   max: 20 };
+    if (diff === 'hard')    return { min: 1,   max: 50 };
+    if (diff === 'vhard')   return { min: 50,  max: 100 };
+    if (diff === 'extreme') return { min: 100, max: 1000 };
+    return { min: 1, max: 50 };
+}
+
+function randInt(min, max) {
+    return Math.floor(rng() * (max - min + 1)) + min;
+}
+
+function generateMathQuiz(op, difficulty) {
+    const { min, max } = getDiffRange(difficulty);
+    const usedAnswers = new Set();
+    const items = [];
+    let attempts = 0;
+
+    while (items.length < 12 && attempts < 5000) {
+        attempts++;
+        let a, b, question, answer;
+
+        if (op === '+') {
+            a = randInt(min, max);
+            b = randInt(min, max);
+            question = `${a} + ${b}`;
+            answer = a + b;
+        } else if (op === '−') {
+            a = randInt(min, max);
+            b = randInt(min, a);
+            question = `${a} − ${b}`;
+            answer = a - b;
+        } else if (op === '×') {
+            if (difficulty === 'extreme') {
+                a = randInt(10, 50);
+                b = randInt(2, 20);
+            } else if (difficulty === 'vhard') {
+                a = randInt(5, 25);
+                b = randInt(2, 12);
+            } else if (difficulty === 'hard') {
+                a = randInt(2, 20);
+                b = randInt(2, 10);
+            } else if (difficulty === 'medium') {
+                a = randInt(2, 12);
+                b = randInt(2, 10);
+            } else {
+                a = randInt(2, 10);
+                b = randInt(2, 10);
+            }
+            question = `${a} × ${b}`;
+            answer = a * b;
+        } else if (op === '÷') {
+            if (difficulty === 'extreme') {
+                b = randInt(5, 30);
+                answer = randInt(5, 50);
+            } else if (difficulty === 'vhard') {
+                b = randInt(3, 20);
+                answer = randInt(3, 25);
+            } else if (difficulty === 'hard') {
+                b = randInt(2, 15);
+                answer = randInt(2, 20);
+            } else if (difficulty === 'medium') {
+                b = randInt(2, 10);
+                answer = randInt(2, 12);
+            } else {
+                b = randInt(2, 10);
+                answer = randInt(1, 10);
+            }
+            a = b * answer;
+            question = `${a} ÷ ${b}`;
+        }
+
+        const answerStr = String(answer);
+
+        if (!usedAnswers.has(answerStr)) {
+            usedAnswers.add(answerStr);
+            items.push({ question, answer: answerStr });
+        }
+    }
+
+    return items;
+}
+
+// ============================================
+// BILDEBASERT MØNSTER
+// ============================================
+
+let puzzleImageUrl = null;
+let selectedImageId = 0;
+let defaultImages = []; // { id, name, url }
+
+function createCanvas() {
+    const c = document.createElement('canvas');
+    c.width = 360;
+    c.height = 480;
+    return { c, ctx: c.getContext('2d') };
+}
+
+/** Landskap med fjell, hytte og vann */
+function generateLandscape() {
+    const { c, ctx } = createCanvas();
+
+    const sky = ctx.createLinearGradient(0, 0, 0, 260);
+    sky.addColorStop(0, '#0f52ba');
+    sky.addColorStop(0.6, '#5b9bd5');
+    sky.addColorStop(1, '#a8d8ea');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, 360, 280);
+
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath(); ctx.arc(290, 75, 38, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#FFF3B0';
+    ctx.beginPath(); ctx.arc(290, 75, 28, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    [[50,55,35],[100,45,25],[160,70,30]].forEach(([x,y,r]) => {
+        ctx.beginPath();
+        ctx.arc(x,y,r,0,Math.PI*2); ctx.arc(x+r*0.9,y-r*0.4,r*0.7,0,Math.PI*2); ctx.arc(x+r*1.5,y,r*0.8,0,Math.PI*2);
+        ctx.fill();
+    });
+
+    ctx.fillStyle = '#5a7d6a';
+    ctx.beginPath(); ctx.moveTo(-20,280); ctx.lineTo(100,150); ctx.lineTo(200,220); ctx.lineTo(280,130); ctx.lineTo(380,240); ctx.lineTo(380,280); ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.moveTo(100,150); ctx.lineTo(85,178); ctx.lineTo(115,175); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(280,130); ctx.lineTo(262,162); ctx.lineTo(298,158); ctx.fill();
+
+    ctx.fillStyle = '#3d6b4e';
+    ctx.beginPath(); ctx.moveTo(40,280); ctx.lineTo(180,190); ctx.lineTo(320,280); ctx.fill();
+
+    const grass = ctx.createLinearGradient(0,270,0,350);
+    grass.addColorStop(0,'#4caf50'); grass.addColorStop(1,'#2e7d32');
+    ctx.fillStyle = grass; ctx.fillRect(0,270,360,80);
+
+    const water = ctx.createLinearGradient(0,340,0,480);
+    water.addColorStop(0,'#2196F3'); water.addColorStop(0.5,'#1565C0'); water.addColorStop(1,'#0D47A1');
+    ctx.fillStyle = water; ctx.fillRect(0,340,360,140);
+
+    ctx.globalAlpha = 0.25; ctx.fillStyle = '#90CAF9';
+    [[20,360,100,3],[150,375,80,2],[250,365,90,3],[60,395,70,2],[200,405,110,3],[30,425,120,2],[180,440,80,3],[80,460,100,2],[260,450,70,3]].forEach(([x,y,w,h]) => ctx.fillRect(x,y,w,h));
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = '#c0392b'; ctx.fillRect(155,248,30,24);
+    ctx.fillStyle = '#7f1d1e'; ctx.beginPath(); ctx.moveTo(150,248); ctx.lineTo(170,234); ctx.lineTo(190,248); ctx.fill();
+    ctx.fillStyle = '#F1C40F'; ctx.fillRect(165,258,8,8);
+
+    return c.toDataURL();
+}
+
+/** Norsk flagg */
+function generateFlag() {
+    const { c, ctx } = createCanvas();
+
+    ctx.fillStyle = '#BA0C2F';
+    ctx.fillRect(0, 0, 360, 480);
+
+    // Hvitt kors
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(100, 0, 60, 480);
+    ctx.fillRect(0, 190, 360, 100);
+
+    // Blått kors
+    ctx.fillStyle = '#00205B';
+    ctx.fillRect(115, 0, 30, 480);
+    ctx.fillRect(0, 205, 360, 70);
+
+    return c.toDataURL();
+}
+
+/** Solnedgang over havet */
+function generateSunset() {
+    const { c, ctx } = createCanvas();
+
+    // Himmel gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, 300);
+    sky.addColorStop(0, '#1a0533');
+    sky.addColorStop(0.3, '#6b2fa0');
+    sky.addColorStop(0.5, '#e85d04');
+    sky.addColorStop(0.7, '#f48c06');
+    sky.addColorStop(1, '#ffba08');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, 360, 300);
+
+    // Sol
+    ctx.fillStyle = '#fff7d6';
+    ctx.beginPath(); ctx.arc(180, 260, 50, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffe566';
+    ctx.beginPath(); ctx.arc(180, 260, 40, 0, Math.PI * 2); ctx.fill();
+
+    // Hav
+    const sea = ctx.createLinearGradient(0, 280, 0, 480);
+    sea.addColorStop(0, '#e85d04');
+    sea.addColorStop(0.3, '#c77b30');
+    sea.addColorStop(0.6, '#1a5276');
+    sea.addColorStop(1, '#0a1628');
+    ctx.fillStyle = sea;
+    ctx.fillRect(0, 280, 360, 200);
+
+    // Solrefleksjon i vann
+    ctx.globalAlpha = 0.4;
+    const refl = ctx.createLinearGradient(0, 280, 0, 480);
+    refl.addColorStop(0, '#ffe566');
+    refl.addColorStop(1, 'transparent');
+    ctx.fillStyle = refl;
+    ctx.fillRect(140, 280, 80, 200);
+    ctx.globalAlpha = 0.2;
+    [[120,300,16,3],[160,320,40,2],[140,345,60,3],[125,370,30,2],[170,390,40,3],[130,415,50,2],[155,440,35,3],[140,465,45,2]].forEach(([x,y,w,h]) => {
+        ctx.fillStyle = '#ffe566'; ctx.fillRect(x,y,w,h);
+    });
+    ctx.globalAlpha = 1;
+
+    // Stjerner
+    ctx.fillStyle = '#fff';
+    [[40,30],[90,60],[280,20],[320,50],[200,15],[50,100],[310,90],[250,45]].forEach(([x,y]) => {
+        ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2); ctx.fill();
+    });
+
+    return c.toDataURL();
+}
+
+/** Nordlys over vinterlandskap */
+function generateNorthernLights() {
+    const { c, ctx } = createCanvas();
+
+    // Nattehimmel
+    const sky = ctx.createLinearGradient(0, 0, 0, 300);
+    sky.addColorStop(0, '#0a0e27');
+    sky.addColorStop(0.5, '#111d4a');
+    sky.addColorStop(1, '#1a2a5e');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, 360, 320);
+
+    // Nordlys (bølgende grønne/lilla bånd)
+    ctx.globalAlpha = 0.3;
+    const colors = ['#00ff88','#00cc66','#22ddaa','#8844ff','#00ff88'];
+    colors.forEach((color, i) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 18 + i * 4;
+        ctx.beginPath();
+        ctx.moveTo(-20, 80 + i * 30);
+        ctx.bezierCurveTo(80, 40 + i * 25, 160, 120 + i * 20, 240, 60 + i * 30);
+        ctx.bezierCurveTo(300, 30 + i * 28, 340, 90 + i * 22, 380, 50 + i * 30);
+        ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // Stjerner
+    ctx.fillStyle = '#fff';
+    [[30,20],[80,50],[150,15],[220,40],[290,25],[340,55],[50,90],[180,80],
+     [260,70],[320,100],[40,140],[130,130],[250,150],[310,135]].forEach(([x,y]) => {
+        ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI*2); ctx.fill();
+    });
+
+    // Snødekket bakke
+    const snow = ctx.createLinearGradient(0, 300, 0, 480);
+    snow.addColorStop(0, '#d6e8f0');
+    snow.addColorStop(0.3, '#c4dce8');
+    snow.addColorStop(1, '#a8c8d8');
+    ctx.fillStyle = snow;
+    ctx.fillRect(0, 300, 360, 180);
+
+    // Snødekte trær (grantrær)
+    const trees = [[60,280,40],[140,260,50],[250,270,45],[330,285,35],[90,310,30],[200,295,38],[300,305,32]];
+    trees.forEach(([x, y, h]) => {
+        // Stamme
+        ctx.fillStyle = '#4a3728';
+        ctx.fillRect(x - 3, y, 6, h * 0.3);
+        // Grønt tre
+        ctx.fillStyle = '#1a4d2e';
+        ctx.beginPath(); ctx.moveTo(x, y - h * 0.6); ctx.lineTo(x - h * 0.35, y); ctx.lineTo(x + h * 0.35, y); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x, y - h * 0.8); ctx.lineTo(x - h * 0.25, y - h * 0.3); ctx.lineTo(x + h * 0.25, y - h * 0.3); ctx.fill();
+        // Snø på tre
+        ctx.fillStyle = 'rgba(220,235,245,0.7)';
+        ctx.beginPath(); ctx.moveTo(x, y - h * 0.8); ctx.lineTo(x - h * 0.18, y - h * 0.5); ctx.lineTo(x + h * 0.18, y - h * 0.5); ctx.fill();
+    });
+
+    // Snøflak
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    [[20,180],[70,220],[120,190],[170,240],[220,200],[270,230],[320,210],
+     [45,260],[95,280],[160,270],[210,290],[280,260],[340,280]].forEach(([x,y]) => {
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+    });
+
+    return c.toDataURL();
+}
+
+/** Romskip / verdensrom */
+function generateSpace() {
+    const { c, ctx } = createCanvas();
+
+    // Mørk bakgrunn
+    const bg = ctx.createRadialGradient(180, 240, 50, 180, 240, 350);
+    bg.addColorStop(0, '#1a1a3e');
+    bg.addColorStop(1, '#0a0a1a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 360, 480);
+
+    // Stjerner
+    ctx.fillStyle = '#fff';
+    const stars = [
+        [20,15],[55,40],[100,20],[150,55],[200,10],[250,35],[300,25],[340,50],
+        [30,80],[80,110],[140,90],[210,120],[270,85],[330,100],[15,150],[70,170],
+        [130,155],[190,180],[250,145],[310,165],[40,210],[100,230],[170,205],
+        [230,240],[290,215],[350,235],[25,270],[85,290],[155,275],[220,300],
+        [280,265],[345,285],[50,330],[120,350],[180,320],[240,340],[310,325],
+        [35,380],[95,400],[160,385],[225,410],[285,370],[340,395],[20,440],
+        [80,460],[145,445],[210,470],[275,435],[330,455],
+    ];
+    stars.forEach(([x,y]) => {
+        const r = Math.random() > 0.7 ? 2 : 1;
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    });
+
+    // Planet (stor)
+    const planet = ctx.createRadialGradient(140, 200, 10, 180, 180, 80);
+    planet.addColorStop(0, '#4FC3F7');
+    planet.addColorStop(0.5, '#0288D1');
+    planet.addColorStop(1, '#01579B');
+    ctx.fillStyle = planet;
+    ctx.beginPath(); ctx.arc(160, 200, 70, 0, Math.PI*2); ctx.fill();
+
+    // Ring rundt planet
+    ctx.strokeStyle = 'rgba(200,200,255,0.5)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(160, 200, 110, 25, -0.3, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Liten planet
+    const p2 = ctx.createRadialGradient(290, 350, 5, 300, 340, 30);
+    p2.addColorStop(0, '#FF8A65');
+    p2.addColorStop(1, '#BF360C');
+    ctx.fillStyle = p2;
+    ctx.beginPath(); ctx.arc(290, 350, 28, 0, Math.PI*2); ctx.fill();
+
+    // Rakett
+    ctx.fillStyle = '#E0E0E0';
+    ctx.beginPath(); ctx.moveTo(70, 350); ctx.lineTo(85, 310); ctx.lineTo(100, 350); ctx.fill();
+    ctx.fillStyle = '#F44336';
+    ctx.beginPath(); ctx.moveTo(85, 310); ctx.lineTo(78, 325); ctx.lineTo(92, 325); ctx.fill();
+    ctx.fillStyle = '#FF9800';
+    ctx.beginPath(); ctx.moveTo(75, 350); ctx.lineTo(85, 380); ctx.lineTo(95, 350); ctx.fill();
+    ctx.fillStyle = '#FFEB3B';
+    ctx.beginPath(); ctx.moveTo(80, 350); ctx.lineTo(85, 370); ctx.lineTo(90, 350); ctx.fill();
+    // Vindu
+    ctx.fillStyle = '#64B5F6';
+    ctx.beginPath(); ctx.arc(85, 332, 5, 0, Math.PI*2); ctx.fill();
+
+    return c.toDataURL();
+}
+
+/** Generer alle standardbilder */
+function generateAllDefaultImages() {
+    defaultImages = [
+        { id: 0, name: 'Landskap',    url: generateLandscape() },
+        { id: 1, name: 'Flagg',       url: generateFlag() },
+        { id: 2, name: 'Solnedgang',  url: generateSunset() },
+        { id: 3, name: 'Nordlys',     url: generateNorthernLights() },
+        { id: 4, name: 'Verdensrom',  url: generateSpace() },
+    ];
+}
+
+/** Returner CSS-stil for en brikke (bildedel) */
+function getBrickStyle(pieceIndex) {
+    const col = pieceIndex % 3;
+    const row = Math.floor(pieceIndex / 3);
+    return {
+        backgroundImage: `url('${puzzleImageUrl}')`,
+        backgroundSize: '300% 400%',
+        backgroundPosition: `${col * 50}% ${row * (100 / 3)}%`,
+    };
+}
+
+/** Håndter opplastet bilde */
+function handleImageUpload(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            // Tegn bildet på canvas i 3:4 format for å passe rutenettet
+            const c = document.createElement('canvas');
+            c.width = 360;
+            c.height = 480;
+            const ctx = c.getContext('2d');
+
+            // Crop-to-fill: fyll 3:4-rammen uten forvrengning
+            const targetRatio = 3 / 4;
+            const imgRatio = img.width / img.height;
+            let sx = 0, sy = 0, sw = img.width, sh = img.height;
+            if (imgRatio > targetRatio) {
+                sw = img.height * targetRatio;
+                sx = (img.width - sw) / 2;
+            } else {
+                sh = img.width / targetRatio;
+                sy = (img.height - sh) / 2;
+            }
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 360, 480);
+            puzzleImageUrl = c.toDataURL();
+            renderRefGrid();
+            renderUserGrid();
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+const badgeColors = [
+    '#e74c3c', '#3498db', '#2ecc71', '#f39c12',
+    '#9b59b6', '#1abc9c', '#e91e63', '#00bcd4',
+    '#ff9800', '#673ab7', '#4caf50', '#f44336',
+];
+
+// ============================================
+// TILSTAND
+// ============================================
+
+let currentScreen = 'menu';    // 'menu' eller 'game'
+let currentMode = 'student';   // 'teacher' eller 'student'
+let selectedThemeId = null;
+let selectedDifficulty = 'easy';
+
+let quizData = [];
+let matches = {};
+let selectedQuestion = null;
+let isChecked = false;
+let shuffledAnswerIndices = [];
+let lockedMatches = new Set();
+
+// ============================================
+// DOM-REFERANSER
+// ============================================
+
+const menuEl = document.getElementById('menu');
+const appEl = document.getElementById('app');
+const modeOptionsEl = document.getElementById('mode-options');
+const themeGridEl = document.getElementById('theme-grid');
+const difficultySectionEl = document.getElementById('difficulty-section');
+const difficultyOptionsEl = document.getElementById('difficulty-options');
+const startBtnEl = document.getElementById('start-btn');
+const backBtnEl = document.getElementById('back-btn');
+const gameSubtitleEl = document.getElementById('game-subtitle');
+
+const questionsList = document.getElementById('questions-list');
+const answersList = document.getElementById('answers-list');
+const matchesList = document.getElementById('matches-list');
+const matchCountEl = document.getElementById('match-count');
+const allMatchedMsg = document.getElementById('all-matched-msg');
+const userGrid = document.getElementById('user-grid');
+const refGrid = document.getElementById('ref-grid');
+const checkBtn = document.getElementById('check-btn');
+const resetBtn = document.getElementById('reset-btn');
+const resultArea = document.getElementById('result-area');
+const confettiCanvas = document.getElementById('confetti-canvas');
+const uploadBtn = document.getElementById('upload-btn');
+const imageInput = document.getElementById('image-input');
+const imagePickerRow = document.getElementById('image-picker-row');
+
+const passwordModal = document.getElementById('password-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalDesc = document.getElementById('modal-desc');
+const modalPassword = document.getElementById('modal-password');
+const modalPasswordConfirm = document.getElementById('modal-password-confirm');
+const modalError = document.getElementById('modal-error');
+const modalOkBtn = document.getElementById('modal-ok-btn');
+const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+// ============================================
+// TOUCH-DETEKSJON OG HJELPEFUNKSJONER
+// ============================================
+
+const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+const actionVerb = isTouchDevice ? 'Trykk' : 'Klikk';
+const checkHelper = document.getElementById('check-helper');
+const gameInstructions = document.getElementById('game-instructions');
+
+function updateInstructions() {
+    if (!gameInstructions) return;
+    if (isChecked) {
+        gameInstructions.textContent = '';
+        return;
+    }
+    if (selectedQuestion !== null) {
+        gameInstructions.textContent = `${actionVerb} nå på riktig svar for oppgave ${selectedQuestion + 1}.`;
+        gameInstructions.style.color = '#3b82f6';
+        gameInstructions.style.fontWeight = '600';
+    } else if (matchCount() === 12) {
+        gameInstructions.textContent = `Alle matcher er satt! ${actionVerb} «Sjekk svar».`;
+        gameInstructions.style.color = '#22c55e';
+        gameInstructions.style.fontWeight = '600';
+    } else if (matchCount() === 0) {
+        gameInstructions.textContent = `${actionVerb} på en oppgave, deretter på riktig svar.`;
+        gameInstructions.style.color = '#475569';
+        gameInstructions.style.fontWeight = '';
+    } else {
+        gameInstructions.textContent = `${matchCount()} av 12 matcher satt. ${actionVerb} på neste oppgave.`;
+        gameInstructions.style.color = '#475569';
+        gameInstructions.style.fontWeight = '';
+    }
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('visible'), 10);
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+let _toastShownAt6 = false;
+
+function playTone(frequency, duration) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = frequency;
+        gain.gain.value = 0.1;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.stop(ctx.currentTime + duration);
+    } catch(e) { /* lyd ikke støttet */ }
+}
+
+function playMatchSound() { playTone(660, 0.1); }
+function playCorrectSound() { playTone(880, 0.15); }
+function playIncorrectSound() { playTone(220, 0.3); }
+
+// ============================================
+// MENYLOGIKK
+// ============================================
+
+// ============================================
+// PASSORD FOR LÆRERMODUS
+// ============================================
+
+const TEACHER_PW_KEY = 'loko_teacher_password';
+
+function getStoredPassword() {
+    return localStorage.getItem(TEACHER_PW_KEY);
+}
+
+function setStoredPassword(pw) {
+    localStorage.setItem(TEACHER_PW_KEY, pw);
+}
+
+let modalResolve = null;
+
+function showPasswordModal(mode) {
+    // mode: 'set' (opprett passord), 'enter' (skriv inn passord), 'change' (endre passord)
+    modalPassword.value = '';
+    modalPasswordConfirm.value = '';
+    modalError.textContent = '';
+
+    if (mode === 'set') {
+        modalTitle.textContent = 'Opprett lærerpassord';
+        modalDesc.textContent = 'Lag et passord for å beskytte lærermodus';
+        modalPasswordConfirm.style.display = '';
+        modalOkBtn.textContent = 'Lagre';
+    } else if (mode === 'enter') {
+        modalTitle.textContent = 'Logg inn som lærer';
+        modalDesc.textContent = 'Skriv inn passordet for lærermodus';
+        modalPasswordConfirm.style.display = 'none';
+        modalOkBtn.textContent = 'Logg inn';
+    } else if (mode === 'verify-old') {
+        modalTitle.textContent = 'Bekreft nåværende passord';
+        modalDesc.textContent = 'Skriv inn ditt nåværende passord for å endre det';
+        modalPasswordConfirm.style.display = 'none';
+        modalOkBtn.textContent = 'Bekreft';
+    } else if (mode === 'change') {
+        modalTitle.textContent = 'Endre passord';
+        modalDesc.textContent = 'Skriv inn nytt passord for lærermodus';
+        modalPasswordConfirm.style.display = '';
+        modalOkBtn.textContent = 'Lagre';
+    }
+
+    passwordModal.classList.remove('hidden');
+    modalPassword.focus();
+
+    return new Promise(resolve => {
+        modalResolve = resolve;
+    });
+}
+
+function hidePasswordModal(result) {
+    passwordModal.classList.add('hidden');
+    if (modalResolve) {
+        modalResolve(result);
+        modalResolve = null;
+    }
+}
+
+modalCancelBtn.addEventListener('click', () => hidePasswordModal(false));
+
+modalOkBtn.addEventListener('click', () => {
+    const pw = modalPassword.value;
+    const confirmVisible = modalPasswordConfirm.style.display !== 'none';
+
+    if (!pw) {
+        modalError.textContent = 'Passord kan ikke være tomt';
+        return;
+    }
+
+    if (confirmVisible) {
+        // Opprett / endre modus
+        const confirm = modalPasswordConfirm.value;
+        if (pw !== confirm) {
+            modalError.textContent = 'Passordene er ikke like';
+            return;
+        }
+        if (pw.length < 3) {
+            modalError.textContent = 'Passordet må ha minst 3 tegn';
+            return;
+        }
+        setStoredPassword(pw);
+        hidePasswordModal(true);
+    } else {
+        // Innlogging eller verifisering av gammelt passord
+        if (pw === getStoredPassword()) {
+            hidePasswordModal(true);
+        } else {
+            modalError.textContent = 'Feil passord';
+            modalPassword.value = '';
+            modalPassword.focus();
+        }
+    }
+});
+
+// Tillat Enter-tast i passordfelter
+modalPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') modalOkBtn.click();
+});
+modalPasswordConfirm.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') modalOkBtn.click();
+});
+
+// Klikk på bakgrunn lukker modalen
+passwordModal.addEventListener('click', (e) => {
+    if (e.target === passwordModal) hidePasswordModal(false);
+});
+
+async function tryEnterTeacherMode() {
+    const stored = getStoredPassword();
+
+    if (!stored) {
+        // Ingen passord satt ennå – opprett
+        const ok = await showPasswordModal('set');
+        if (ok) {
+            currentMode = 'teacher';
+            renderModeOptions();
+        }
+    } else {
+        // Passord finnes – krever innlogging
+        const ok = await showPasswordModal('enter');
+        if (ok) {
+            currentMode = 'teacher';
+            renderModeOptions();
+        }
+    }
+}
+
+async function changeTeacherPassword() {
+    // Steg 1: Bekreft gammelt passord
+    const verified = await showPasswordModal('verify-old');
+    if (!verified) return;
+
+    // Steg 2: Sett nytt passord
+    await showPasswordModal('change');
+}
+
+function renderModeOptions() {
+    modeOptionsEl.innerHTML = '';
+
+    const modes = [
+        { id: 'teacher', icon: '👩‍🏫', name: 'Lærer', desc: 'Se fasit og velg bilder' },
+        { id: 'student', icon: '👦', name: 'Elev', desc: 'Spill og sjekk svar' },
+    ];
+
+    modes.forEach(mode => {
+        const card = document.createElement('div');
+        card.className = 'mode-card' + (currentMode === mode.id ? ' selected' : '');
+        card.innerHTML = `
+            <span class="mode-icon">${mode.icon}</span>
+            <h4>${mode.name}</h4>
+            <p>${mode.desc}</p>
+        `;
+        card.addEventListener('click', () => {
+            if (mode.id === 'teacher' && currentMode !== 'teacher') {
+                tryEnterTeacherMode();
+            } else if (mode.id === 'student') {
+                currentMode = 'student';
+                renderModeOptions();
+            }
+        });
+        modeOptionsEl.appendChild(card);
+    });
+
+    // Vis «Endre passord»-lenke i lærermodus
+    if (currentMode === 'teacher') {
+        const link = document.createElement('span');
+        link.className = 'change-password-link';
+        link.textContent = '🔒 Endre passord';
+        link.addEventListener('click', changeTeacherPassword);
+        modeOptionsEl.appendChild(link);
+    }
+}
+
+// ============================================
+// TEMA-EDITOR
+// ============================================
+
+let editingThemeId = null;
+let selectedEditorEmoji = EMOJI_OPTIONS[0];
+
+function openCustomThemeEditor(existingId = null) {
+    editingThemeId = existingId;
+    const nameInput = document.getElementById('editor-theme-name');
+    const errorEl = document.getElementById('editor-error');
+    const titleEl = document.getElementById('editor-title');
+    errorEl.textContent = '';
+
+    // Fyll emoji-velger
+    const emojiPicker = document.getElementById('emoji-picker');
+    emojiPicker.innerHTML = '';
+    EMOJI_OPTIONS.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.className = 'emoji-option' + (selectedEditorEmoji === emoji ? ' selected' : '');
+        btn.textContent = emoji;
+        btn.type = 'button';
+        btn.addEventListener('click', () => {
+            selectedEditorEmoji = emoji;
+            emojiPicker.querySelectorAll('.emoji-option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+        emojiPicker.appendChild(btn);
+    });
+
+    // Fyll par-grid
+    const pairsGrid = document.getElementById('pairs-grid');
+    pairsGrid.innerHTML = '';
+
+    let existingPairs = null;
+    if (existingId) {
+        const ct = getCustomThemes().find(t => t.id === existingId);
+        if (ct) {
+            nameInput.value = ct.name;
+            selectedEditorEmoji = ct.icon;
+            existingPairs = ct.pairs;
+            titleEl.textContent = 'Rediger tema';
+            // Oppdater emoji-velger
+            emojiPicker.querySelectorAll('.emoji-option').forEach(b => {
+                b.classList.toggle('selected', b.textContent === ct.icon);
+            });
+        }
+    } else {
+        nameInput.value = '';
+        selectedEditorEmoji = EMOJI_OPTIONS[0];
+        titleEl.textContent = 'Lag eget tema';
+        emojiPicker.querySelector('.emoji-option').classList.add('selected');
+    }
+
+    for (let i = 0; i < 12; i++) {
+        const row = document.createElement('div');
+        row.className = 'pair-row';
+
+        const num = document.createElement('span');
+        num.className = 'pair-num';
+        num.textContent = i + 1;
+
+        const qInput = document.createElement('input');
+        qInput.type = 'text';
+        qInput.className = 'pair-input';
+        qInput.placeholder = 'Spørsmål';
+        qInput.id = `pair-q-${i}`;
+        qInput.value = existingPairs ? existingPairs[i].question : '';
+
+        const aInput = document.createElement('input');
+        aInput.type = 'text';
+        aInput.className = 'pair-input';
+        aInput.placeholder = 'Svar';
+        aInput.id = `pair-a-${i}`;
+        aInput.value = existingPairs ? existingPairs[i].answer : '';
+
+        row.appendChild(num);
+        row.appendChild(qInput);
+        row.appendChild(aInput);
+        pairsGrid.appendChild(row);
+    }
+
+    showScreen('editor');
+}
+
+function saveCustomTheme() {
+    const name = document.getElementById('editor-theme-name').value.trim();
+    const errorEl = document.getElementById('editor-error');
+    errorEl.textContent = '';
+
+    if (!name) {
+        errorEl.textContent = 'Skriv inn et temanavn';
+        return;
+    }
+
+    const pairs = [];
+    let hasEmpty = false;
+    for (let i = 0; i < 12; i++) {
+        const q = document.getElementById(`pair-q-${i}`).value.trim();
+        const a = document.getElementById(`pair-a-${i}`).value.trim();
+        if (!q || !a) {
+            hasEmpty = true;
+            if (!q) document.getElementById(`pair-q-${i}`).classList.add('error');
+            if (!a) document.getElementById(`pair-a-${i}`).classList.add('error');
+        } else {
+            document.getElementById(`pair-q-${i}`).classList.remove('error');
+            document.getElementById(`pair-a-${i}`).classList.remove('error');
+        }
+        pairs.push({ question: q, answer: a });
+    }
+
+    if (hasEmpty) {
+        errorEl.textContent = 'Fyll ut alle 12 spørsmål og svar';
+        return;
+    }
+
+    const list = getCustomThemes();
+
+    if (editingThemeId) {
+        const idx = list.findIndex(t => t.id === editingThemeId);
+        if (idx >= 0) {
+            list[idx].name = name;
+            list[idx].icon = selectedEditorEmoji;
+            list[idx].pairs = pairs;
+        }
+    } else {
+        list.push({
+            id: 'custom_' + Date.now(),
+            name: name,
+            icon: selectedEditorEmoji,
+            pairs: pairs,
+        });
+    }
+
+    saveCustomThemes(list);
+    showScreen('menu');
+    renderMenu();
+    updateStartButton();
+}
+
+// Event listeners for editor
+document.getElementById('editor-save-btn').addEventListener('click', saveCustomTheme);
+document.getElementById('editor-cancel-btn').addEventListener('click', () => {
+    showScreen('menu');
+    renderMenu();
+});
+document.getElementById('editor-back-btn').addEventListener('click', () => {
+    showScreen('menu');
+    renderMenu();
+});
+
+// Fjern error-klasse ved input
+document.getElementById('pairs-grid').addEventListener('input', (e) => {
+    if (e.target.classList.contains('pair-input')) {
+        e.target.classList.remove('error');
+    }
+});
+
+function renderMenu() {
+    themeGridEl.innerHTML = '';
+    const allThemes = getAllThemes();
+
+    allThemes.forEach(theme => {
+        const card = document.createElement('div');
+        card.className = 'theme-card' + (selectedThemeId === theme.id ? ' selected' : '');
+
+        card.innerHTML = `
+            <span class="theme-icon">${theme.icon}</span>
+            <h3>${theme.name}</h3>
+            <p>${theme.description}</p>
+        `;
+
+        // Rediger/slett-knapper for egne temaer (kun lærermodus)
+        if (theme.isCustom && currentMode === 'teacher') {
+            const actions = document.createElement('div');
+            actions.className = 'theme-card-actions';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'theme-edit-btn';
+            editBtn.textContent = '✏️';
+            editBtn.title = 'Rediger';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openCustomThemeEditor(theme.id);
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'theme-delete-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.title = 'Slett';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Slette "${theme.name}"?`)) {
+                    const list = getCustomThemes().filter(ct => ct.id !== theme.id);
+                    saveCustomThemes(list);
+                    if (selectedThemeId === theme.id) selectedThemeId = null;
+                    renderMenu();
+                    updateStartButton();
+                }
+            });
+
+            actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
+            card.appendChild(actions);
+        }
+
+        card.addEventListener('click', () => {
+            selectedThemeId = theme.id;
+            renderMenu();
+            updateDifficultySection();
+            updateStartButton();
+        });
+
+        themeGridEl.appendChild(card);
+    });
+
+    // "Lag eget tema"-kort (kun lærermodus)
+    if (currentMode === 'teacher') {
+        const createCard = document.createElement('div');
+        createCard.className = 'theme-card';
+        createCard.innerHTML = `
+            <span class="theme-icon">✏️</span>
+            <h3>Lag eget tema</h3>
+            <p>Opprett egne oppgaver</p>
+        `;
+        createCard.addEventListener('click', () => openCustomThemeEditor());
+        themeGridEl.appendChild(createCard);
+    }
+}
+
+function updateDifficultySection() {
+    const theme = getAllThemes().find(t => t.id === selectedThemeId);
+
+    if (theme && theme.hasDifficulty) {
+        difficultySectionEl.classList.add('visible');
+        renderDifficultyOptions();
+    } else {
+        difficultySectionEl.classList.remove('visible');
+    }
+}
+
+function renderDifficultyOptions() {
+    difficultyOptionsEl.innerHTML = '';
+
+    difficulties.forEach(diff => {
+        const btn = document.createElement('button');
+        btn.className = 'diff-btn' + (selectedDifficulty === diff.id ? ' selected' : '');
+        btn.textContent = `${diff.label} (${diff.description})`;
+
+        btn.addEventListener('click', () => {
+            selectedDifficulty = diff.id;
+            renderDifficultyOptions();
+        });
+
+        difficultyOptionsEl.appendChild(btn);
+    });
+}
+
+function updateStartButton() {
+    startBtnEl.disabled = !selectedThemeId;
+}
+
+let currentGameCode = null;
+let preSeededShuffle = null;
+
+function startGame(fromCode = false, codeData = null) {
+    let theme, subtitle;
+    currentGameCode = null;
+    preSeededShuffle = null;
+
+    const codeBanner = document.getElementById('game-code-banner');
+    codeBanner.classList.add('hidden');
+
+    if (fromCode && codeData) {
+        // Spill fra spillkode
+        theme = codeData.theme;
+        subtitle = codeData.subtitle;
+        rng = mulberry32(codeData.seed);
+        quizData = theme.generate(codeData.difficulty || 'easy');
+        preSeededShuffle = shuffleArray([...Array(12).keys()]);
+        rng = Math.random;
+    } else {
+        theme = getAllThemes().find(t => t.id === selectedThemeId);
+        if (!theme) return;
+
+        if (currentMode === 'teacher') {
+            // Generer seed og lag spillkode
+            const seed = Math.floor(Math.random() * 24000000);
+            rng = mulberry32(seed);
+            quizData = theme.generate(selectedDifficulty);
+            preSeededShuffle = shuffleArray([...Array(12).keys()]);
+            rng = Math.random;
+
+            if (theme.isCustom) {
+                const ct = getCustomThemes().find(c => c.id === theme.id);
+                if (ct) currentGameCode = encodeCustomGameCode(ct, seed);
+            } else {
+                const themeIndex = BUILTIN_THEME_IDS.indexOf(theme.id);
+                if (themeIndex >= 0) currentGameCode = encodeGameCode(themeIndex, selectedDifficulty, seed);
+            }
+        } else {
+            quizData = theme.generate(selectedDifficulty);
+        }
+
+        subtitle = theme.name;
+        if (theme.hasDifficulty) {
+            const diff = difficulties.find(d => d.id === selectedDifficulty);
+            subtitle += ` – ${diff.label}`;
+        }
+    }
+
+    gameSubtitleEl.textContent = subtitle;
+    showScreen('game');
+    initGame();
+
+    // Vis spillkode-banner for lærere
+    if (currentGameCode && currentMode === 'teacher') {
+        document.getElementById('game-code-display').textContent = currentGameCode;
+        codeBanner.classList.remove('hidden');
+    }
+}
+
+function showScreen(screen) {
+    currentScreen = screen;
+    const editorEl = document.getElementById('custom-theme-editor');
+
+    menuEl.style.display = screen === 'menu' ? '' : 'none';
+    appEl.classList.toggle('visible', screen === 'game');
+    editorEl.classList.toggle('hidden', screen !== 'editor');
+}
+
+function goBackToMenu() {
+    showScreen('menu');
+}
+
+// ============================================
+// HJELPEFUNKSJONER
+// ============================================
+
+function shuffleArray(arr) {
+    const shuffled = [...arr];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+function isAnswerUsed(answerIndex) {
+    return Object.values(matches).includes(answerIndex);
+}
+
+function findQuestionUsingAnswer(answerIndex) {
+    for (const [qIdx, aIdx] of Object.entries(matches)) {
+        if (aIdx === answerIndex) return parseInt(qIdx);
+    }
+    return null;
+}
+
+function matchCount() {
+    return Object.keys(matches).length;
+}
+
+// ============================================
+// INITIALISERING
+// ============================================
+
+function initGame() {
+    matches = {};
+    selectedQuestion = null;
+    isChecked = false;
+    lockedMatches = new Set();
+    _toastShownAt6 = false;
+    resultArea.innerHTML = '';
+    allMatchedMsg.innerHTML = '';
+
+    if (preSeededShuffle) {
+        shuffledAnswerIndices = preSeededShuffle;
+        preSeededShuffle = null;
+    } else {
+        shuffledAnswerIndices = shuffleArray([...Array(12).keys()]);
+    }
+
+    render();
+    renderRefGrid();
+    renderImagePicker();
+}
+
+// ============================================
+// GJENGIVELSE
+// ============================================
+
+function render() {
+    renderQuestions();
+    renderAnswers();
+    renderMatchesList();
+    renderUserGrid();
+    updateCheckButton();
+    updateInstructions();
+}
+
+function renderQuestions() {
+    questionsList.innerHTML = '';
+
+    quizData.forEach((q, i) => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.setAttribute('role', 'listitem');
+        item.dataset.index = i;
+
+        const isLocked = lockedMatches.has(i);
+
+        if (selectedQuestion === i) item.classList.add('selected');
+
+        const hasMatch = matches[i] !== undefined;
+        if (hasMatch && !isChecked && !isLocked) item.classList.add('matched');
+
+        if (isLocked) {
+            item.classList.add('locked');
+        } else if (isChecked) {
+            item.classList.add('disabled');
+            if (hasMatch) {
+                item.classList.add(matches[i] === i ? 'correct' : 'incorrect');
+            }
+        }
+
+        if (hasMatch) {
+            const badge = document.createElement('span');
+            badge.className = 'match-badge';
+            badge.style.background = badgeColors[i];
+            badge.textContent = i + 1;
+            item.appendChild(badge);
+        }
+
+        const text = document.createElement('span');
+        text.className = 'item-text';
+        text.textContent = q.question;
+        item.appendChild(text);
+
+        if (isLocked) {
+            const icon = document.createElement('span');
+            icon.className = 'result-icon';
+            icon.textContent = '✓';
+            item.appendChild(icon);
+        } else if (isChecked && hasMatch) {
+            const icon = document.createElement('span');
+            icon.className = 'result-icon';
+            icon.textContent = matches[i] === i ? '✓' : '✗';
+            item.appendChild(icon);
+        }
+
+        if (!isChecked && !isLocked) {
+            item.addEventListener('click', () => onQuestionClick(i));
+        }
+
+        questionsList.appendChild(item);
+    });
+}
+
+function renderAnswers() {
+    answersList.innerHTML = '';
+
+    shuffledAnswerIndices.forEach(origIndex => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.setAttribute('role', 'listitem');
+        item.dataset.origIndex = origIndex;
+
+        const used = isAnswerUsed(origIndex);
+        const qUsingThis = findQuestionUsingAnswer(origIndex);
+        const isLocked = qUsingThis !== null && lockedMatches.has(qUsingThis);
+
+        if (used && !isChecked && !isLocked) item.classList.add('matched');
+
+        if (isLocked) {
+            item.classList.add('locked');
+        } else if (isChecked) {
+            item.classList.add('disabled');
+            if (used) {
+                item.classList.add(qUsingThis === origIndex ? 'correct' : 'incorrect');
+            }
+        }
+
+        if (used) {
+            const badge = document.createElement('span');
+            badge.className = 'match-badge';
+            badge.style.background = badgeColors[qUsingThis];
+            badge.textContent = qUsingThis + 1;
+            item.appendChild(badge);
+        }
+
+        const text = document.createElement('span');
+        text.className = 'item-text';
+        text.textContent = quizData[origIndex].answer;
+        item.appendChild(text);
+
+        if (isLocked) {
+            const icon = document.createElement('span');
+            icon.className = 'result-icon';
+            icon.textContent = '✓';
+            item.appendChild(icon);
+        } else if (isChecked && used) {
+            const icon = document.createElement('span');
+            icon.className = 'result-icon';
+            icon.textContent = qUsingThis === origIndex ? '✓' : '✗';
+            item.appendChild(icon);
+        }
+
+        if (!isChecked && !isLocked) {
+            item.addEventListener('click', () => onAnswerClick(origIndex));
+        }
+
+        answersList.appendChild(item);
+    });
+}
+
+function renderMatchesList() {
+    matchCountEl.textContent = `(${matchCount()} / 12)`;
+
+    // Milestone-toast ved halvveis
+    if (matchCount() === 6 && !isChecked && !_toastShownAt6) {
+        _toastShownAt6 = true;
+        showToast('Halvveis! 6 av 12 matcher satt.');
+    }
+
+    if (matchCount() === 0) {
+        matchesList.innerHTML = '<p class="no-matches">Ingen matcher ennå</p>';
+        allMatchedMsg.innerHTML = '';
+        return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'matches-grid';
+
+    const sortedKeys = Object.keys(matches).map(Number).sort((a, b) => a - b);
+
+    sortedKeys.forEach(qIdx => {
+        const aIdx = matches[qIdx];
+        const entry = document.createElement('div');
+        entry.className = 'match-entry';
+
+        const isLocked = lockedMatches.has(qIdx);
+
+        if (isLocked) {
+            entry.classList.add('correct');
+        } else if (isChecked) {
+            entry.classList.add(qIdx === aIdx ? 'correct' : 'incorrect');
+        }
+
+        const badge = document.createElement('span');
+        badge.className = 'match-badge-small';
+        badge.style.background = badgeColors[qIdx];
+        badge.textContent = qIdx + 1;
+        entry.appendChild(badge);
+
+        const qText = document.createElement('span');
+        qText.className = 'match-text';
+        qText.textContent = quizData[qIdx].question;
+        entry.appendChild(qText);
+
+        const arrow = document.createElement('span');
+        arrow.className = 'match-arrow';
+        arrow.textContent = '→';
+        entry.appendChild(arrow);
+
+        const aText = document.createElement('span');
+        aText.className = 'match-text';
+        aText.textContent = quizData[aIdx].answer;
+        entry.appendChild(aText);
+
+        if (!isChecked && !isLocked) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = '×';
+            removeBtn.title = 'Fjern match';
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeMatch(qIdx);
+            });
+            entry.appendChild(removeBtn);
+        }
+
+        grid.appendChild(entry);
+    });
+
+    // Fremdriftslinje
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    const fill = document.createElement('div');
+    fill.className = 'progress-fill';
+    fill.style.width = `${(matchCount() / 12) * 100}%`;
+    progressBar.appendChild(fill);
+
+    matchesList.innerHTML = '';
+    matchesList.appendChild(grid);
+    matchesList.appendChild(progressBar);
+
+    if (matchCount() === 12 && !isChecked) {
+        allMatchedMsg.innerHTML = `<p class="all-matched-message">Alle 12 matcher er satt! ${actionVerb} «Sjekk svar» for å se resultatet.</p>`;
+    } else {
+        allMatchedMsg.innerHTML = '';
+    }
+}
+
+function renderUserGrid(justPlaced) {
+    const lokoSection = userGrid.closest('.loko-section');
+    if (lokoSection) {
+        lokoSection.style.display = (matchCount() >= 12 || isChecked) ? '' : 'none';
+    }
+
+    userGrid.innerHTML = '';
+
+    for (let i = 0; i < 12; i++) {
+        const brick = document.createElement('div');
+        brick.className = 'brick';
+
+        if (matches[i] !== undefined) {
+            const style = getBrickStyle(matches[i]);
+            brick.style.backgroundImage = style.backgroundImage;
+            brick.style.backgroundSize = style.backgroundSize;
+            brick.style.backgroundPosition = style.backgroundPosition;
+            brick.classList.add('filled');
+            if (justPlaced === i) {
+                brick.classList.add('just-placed');
+            }
+        } else {
+            brick.classList.add('empty');
+        }
+
+        userGrid.appendChild(brick);
+    }
+}
+
+function renderRefGrid() {
+    const refWrapper = refGrid.closest('.loko-grid-wrapper');
+
+    // I elevmodus: skjul fasitmønster inntil svar er sjekket
+    if (currentMode === 'student' && !isChecked) {
+        refWrapper.style.display = 'none';
+    } else {
+        refWrapper.style.display = '';
+    }
+
+    refGrid.innerHTML = '';
+
+    for (let i = 0; i < 12; i++) {
+        const brick = document.createElement('div');
+        brick.className = 'brick filled';
+        const style = getBrickStyle(i);
+        brick.style.backgroundImage = style.backgroundImage;
+        brick.style.backgroundSize = style.backgroundSize;
+        brick.style.backgroundPosition = style.backgroundPosition;
+        refGrid.appendChild(brick);
+    }
+}
+
+function renderImagePicker() {
+    imagePickerRow.innerHTML = '';
+    const uploadRow = uploadBtn.parentElement;
+
+    // I elevmodus: skjul bildevelger og opplasting
+    if (currentMode === 'student') {
+        imagePickerRow.style.display = 'none';
+        uploadRow.style.display = 'none';
+        return;
+    }
+    imagePickerRow.style.display = '';
+    uploadRow.style.display = '';
+
+    defaultImages.forEach((img, idx) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'image-thumb' + (selectedImageId === idx ? ' active' : '');
+        thumb.style.backgroundImage = `url('${img.url}')`;
+        thumb.title = img.name;
+        thumb.addEventListener('click', () => {
+            selectedImageId = idx;
+            puzzleImageUrl = img.url;
+            renderImagePicker();
+            renderRefGrid();
+            renderUserGrid();
+        });
+        imagePickerRow.appendChild(thumb);
+    });
+}
+
+function updateCheckButton() {
+    const enabled = matchCount() >= 12 && !isChecked;
+    checkBtn.disabled = !enabled;
+    if (checkHelper) {
+        checkHelper.style.display = enabled || isChecked ? 'none' : '';
+    }
+}
+
+// ============================================
+// SPILLLOGIKK
+// ============================================
+
+function onQuestionClick(index) {
+    if (isChecked) return;
+
+    if (selectedQuestion === index) {
+        selectedQuestion = null;
+    } else {
+        selectedQuestion = index;
+    }
+
+    render();
+}
+
+function onAnswerClick(answerOrigIndex) {
+    if (isChecked) return;
+    if (selectedQuestion === null) return;
+
+    const qIdx = selectedQuestion;
+
+    const otherQ = findQuestionUsingAnswer(answerOrigIndex);
+    if (otherQ !== null && otherQ !== qIdx) {
+        delete matches[otherQ];
+    }
+
+    matches[qIdx] = answerOrigIndex;
+    selectedQuestion = null;
+
+    playMatchSound();
+
+    renderQuestions();
+    renderAnswers();
+    renderMatchesList();
+    renderUserGrid(qIdx);
+    updateCheckButton();
+    updateInstructions();
+}
+
+function removeMatch(qIdx) {
+    if (isChecked || lockedMatches.has(qIdx)) return;
+
+    delete matches[qIdx];
+
+    if (selectedQuestion === qIdx) {
+        selectedQuestion = null;
+    }
+
+    render();
+}
+
+function checkAnswers() {
+    if (matchCount() < 12) return;
+
+    isChecked = true;
+
+    let correct = 0;
+    for (let i = 0; i < 12; i++) {
+        if (matches[i] === i) correct++;
+    }
+
+    const msg = document.createElement('div');
+    msg.className = 'result-message';
+
+    if (correct === 12) {
+        msg.classList.add('perfect');
+        msg.textContent = `Fantastisk! ${correct} av 12 riktige! 🎉`;
+        playCorrectSound();
+        showConfetti();
+    } else if (correct >= 9) {
+        msg.classList.add('good');
+        msg.textContent = `Bra jobbet! ${correct} av 12 riktige.`;
+        playCorrectSound();
+    } else {
+        msg.classList.add('poor');
+        msg.textContent = `${correct} av 12 riktige.`;
+        playIncorrectSound();
+    }
+
+    resultArea.innerHTML = '';
+    resultArea.appendChild(msg);
+
+    // Vis "Prøv igjen"-knapp hvis ikke alle er riktige
+    if (correct < 12) {
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.textContent = 'Prøv igjen';
+        retryBtn.addEventListener('click', retryWrongAnswers);
+        resultArea.appendChild(retryBtn);
+    }
+
+    render();
+    renderRefGrid();
+}
+
+function retryWrongAnswers() {
+    // Lås riktige matcher og fjern feil
+    for (let i = 0; i < 12; i++) {
+        if (matches[i] === i) {
+            lockedMatches.add(i);
+        } else if (matches[i] !== undefined) {
+            delete matches[i];
+        }
+    }
+
+    isChecked = false;
+    selectedQuestion = null;
+    resultArea.innerHTML = '';
+    allMatchedMsg.innerHTML = '';
+
+    render();
+    renderRefGrid();
+    renderImagePicker();
+    updateCheckButton();
+}
+
+function resetGame() {
+    lockedMatches = new Set();
+    initGame();
+}
+
+// ============================================
+// KONFETTIANIMASJON
+// ============================================
+
+function showConfetti() {
+    const ctx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
+    const colors = ['#E74C3C', '#3498DB', '#2ECC71', '#F1C40F', '#9B59B6', '#E67E22', '#1ABC9C', '#E91E63'];
+
+    const particles = [];
+    for (let i = 0; i < 180; i++) {
+        particles.push({
+            x: Math.random() * confettiCanvas.width,
+            y: -Math.random() * confettiCanvas.height * 0.6 - 20,
+            vx: (Math.random() - 0.5) * 5,
+            vy: Math.random() * 3 + 1.5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            w: Math.random() * 10 + 4,
+            h: Math.random() * 6 + 3,
+            rotation: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.15,
+        });
+    }
+
+    let frame = 0;
+    const maxFrames = 220;
+
+    function animate() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+        particles.forEach(p => {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.04;
+            p.rotation += p.rotSpeed;
+            p.vx *= 0.99;
+        });
+
+        frame++;
+        if (frame < maxFrames) {
+            requestAnimationFrame(animate);
+        } else {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        }
+    }
+
+    animate();
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+startBtnEl.addEventListener('click', () => startGame());
+backBtnEl.addEventListener('click', () => {
+    if (matchCount() > 0 && !isChecked) {
+        if (confirm('Du har ulagrede matcher. Vil du gå tilbake til menyen?')) {
+            goBackToMenu();
+        }
+    } else {
+        goBackToMenu();
+    }
+});
+checkBtn.addEventListener('click', checkAnswers);
+resetBtn.addEventListener('click', () => {
+    if (matchCount() > 0) {
+        if (confirm('Nullstille alle matcher?')) {
+            resetGame();
+        }
+    } else {
+        resetGame();
+    }
+});
+
+// Spillkode – koble til
+document.getElementById('join-game-btn').addEventListener('click', joinGameFromCode);
+document.getElementById('game-code-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') joinGameFromCode();
+});
+document.getElementById('copy-code-btn').addEventListener('click', () => {
+    const code = document.getElementById('game-code-display').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copy-code-btn');
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = '📋', 1500);
+    });
+});
+
+function joinGameFromCode() {
+    const input = document.getElementById('game-code-input');
+    const errorEl = document.getElementById('game-code-error');
+    const code = input.value.trim();
+    errorEl.classList.add('hidden');
+
+    if (!code) return;
+
+    // Prøv kort kode (innebygd tema)
+    const decoded = decodeGameCode(code);
+    if (decoded) {
+        const theme = themes.find(t => t.id === decoded.themeId);
+        if (theme) {
+            const diff = difficulties.find(d => d.id === decoded.difficultyId);
+            let subtitle = theme.name;
+            if (theme.hasDifficulty && diff) subtitle += ` – ${diff.label}`;
+
+            startGame(true, {
+                theme: theme,
+                difficulty: decoded.difficultyId,
+                seed: decoded.seed,
+                subtitle: subtitle
+            });
+            input.value = '';
+            return;
+        }
+    }
+
+    // Prøv lang kode (egendefinert tema)
+    const customData = decodeCustomGameCode(code);
+    if (customData) {
+        const tempTheme = {
+            id: 'shared_custom',
+            name: customData.name,
+            icon: customData.icon,
+            hasDifficulty: false,
+            generate: () => [...customData.pairs],
+        };
+        startGame(true, {
+            theme: tempTheme,
+            difficulty: null,
+            seed: customData.seed,
+            subtitle: customData.name
+        });
+        input.value = '';
+        return;
+    }
+
+    // Ugyldig kode
+    errorEl.textContent = 'Ugyldig spillkode';
+    errorEl.classList.remove('hidden');
+}
+
+uploadBtn.addEventListener('click', () => imageInput.click());
+imageInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+        handleImageUpload(e.target.files[0]);
+        selectedImageId = -1;
+        renderImagePicker();
+        imageInput.value = '';
+    }
+});
+
+window.addEventListener('resize', () => {
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+});
+
+window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+    }, 100);
+});
+
+// ============================================
+// OPPSTART
+// ============================================
+generateAllDefaultImages();
+puzzleImageUrl = defaultImages[0].url;
+checkLicense();
+renderModeOptions();
+renderMenu();
+updateStartButton();
+</script>
+
+</body>
+</html>
