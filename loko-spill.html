@@ -1470,8 +1470,9 @@
      ============================================ -->
 <div id="app">
     <div class="game-code-banner hidden" id="game-code-banner">
-        <span>Spillkode: <strong id="game-code-display"></strong></span>
-        <button class="copy-code-btn" id="copy-code-btn" title="Kopier kode">📋</button>
+        <span>Del med elevene:</span>
+        <button class="copy-code-btn" id="copy-link-btn" title="Kopier lenke">📋 Kopier lenke</button>
+        <span id="game-code-display" style="display:none;"></span>
     </div>
     <header>
         <div class="back-row">
@@ -1778,14 +1779,11 @@ function decodeGameCode(code) {
 }
 
 function encodeCustomGameCode(customTheme, seed) {
-    const data = {
-        n: customTheme.name,
-        i: customTheme.icon,
-        p: customTheme.pairs.map(p => [p.question, p.answer]),
-        s: seed
-    };
-    const json = JSON.stringify(data);
-    const b64 = btoa(unescape(encodeURIComponent(json)));
+    // Kompakt format: navn|ikon|seed|q1\ta1|q2\ta2|...
+    const parts = [customTheme.name, customTheme.icon, seed];
+    customTheme.pairs.forEach(p => parts.push(p.question + '\t' + p.answer));
+    const str = parts.join('|');
+    const b64 = btoa(unescape(encodeURIComponent(str)));
     return 'C-' + b64;
 }
 
@@ -1793,14 +1791,29 @@ function decodeCustomGameCode(code) {
     if (!code.startsWith('C-')) return null;
     try {
         const b64 = code.substring(2);
-        const json = decodeURIComponent(escape(atob(b64)));
-        const data = JSON.parse(json);
-        return {
-            name: data.n,
-            icon: data.i,
-            pairs: data.p.map(([q, a]) => ({ question: q, answer: a })),
-            seed: data.s
-        };
+        const str = decodeURIComponent(escape(atob(b64)));
+        const parts = str.split('|');
+        if (parts.length < 15) {
+            // Prøv gammelt JSON-format for bakoverkompatibilitet
+            const json = str;
+            const data = JSON.parse(json);
+            return {
+                name: data.n,
+                icon: data.i,
+                pairs: data.p.map(([q, a]) => ({ question: q, answer: a })),
+                seed: data.s
+            };
+        }
+        const name = parts[0];
+        const icon = parts[1];
+        const seed = parseInt(parts[2]);
+        const pairs = [];
+        for (let i = 3; i < parts.length; i++) {
+            const [q, a] = parts[i].split('\t');
+            if (q && a) pairs.push({ question: q, answer: a });
+        }
+        if (pairs.length !== 12) return null;
+        return { name, icon, pairs, seed };
     } catch (e) {
         return null;
     }
@@ -1978,7 +1991,8 @@ function generateMathQuiz(op, difficulty) {
             question = `${a} + ${b}`;
             answer = a + b;
         } else if (op === '−') {
-            a = randInt(min, max);
+            const subMax = difficulty === 'easy' ? 15 : max;
+            a = randInt(min, subMax);
             b = randInt(min, a);
             question = `${a} − ${b}`;
             answer = a - b;
@@ -2013,10 +2027,10 @@ function generateMathQuiz(op, difficulty) {
                 answer = randInt(2, 20);
             } else if (difficulty === 'medium') {
                 b = randInt(2, 10);
-                answer = randInt(2, 12);
+                answer = randInt(1, 15);
             } else {
                 b = randInt(2, 10);
-                answer = randInt(1, 10);
+                answer = randInt(1, 15);
             }
             a = b * answer;
             question = `${a} ÷ ${b}`;
@@ -2028,6 +2042,12 @@ function generateMathQuiz(op, difficulty) {
             usedAnswers.add(answerStr);
             items.push({ question, answer: answerStr });
         }
+    }
+
+    // Sikkerhetsnett: Fyll opp til 12 hvis nødvendig
+    while (items.length < 12) {
+        const fallback = items.length + 100;
+        items.push({ question: `? ${op} ?`, answer: String(fallback) });
     }
 
     return items;
@@ -3270,7 +3290,7 @@ function renderMatchesList() {
 function renderUserGrid(justPlaced) {
     const lokoSection = userGrid.closest('.loko-section');
     if (lokoSection) {
-        lokoSection.style.display = (matchCount() >= 12 || isChecked) ? '' : 'none';
+        lokoSection.style.display = (currentMode === 'teacher' || matchCount() >= 12 || isChecked) ? '' : 'none';
     }
 
     userGrid.innerHTML = '';
@@ -3464,6 +3484,7 @@ function retryWrongAnswers() {
 
     isChecked = false;
     selectedQuestion = null;
+    _toastShownAt6 = false;
     resultArea.innerHTML = '';
     allMatchedMsg.innerHTML = '';
 
@@ -3566,12 +3587,13 @@ document.getElementById('join-game-btn').addEventListener('click', joinGameFromC
 document.getElementById('game-code-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') joinGameFromCode();
 });
-document.getElementById('copy-code-btn').addEventListener('click', () => {
+document.getElementById('copy-link-btn').addEventListener('click', () => {
     const code = document.getElementById('game-code-display').textContent;
-    navigator.clipboard.writeText(code).then(() => {
-        const btn = document.getElementById('copy-code-btn');
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = '📋', 1500);
+    const url = window.location.origin + window.location.pathname + '?code=' + encodeURIComponent(code);
+    navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copy-link-btn');
+        btn.textContent = '✓ Kopiert!';
+        setTimeout(() => btn.textContent = '📋 Kopier lenke', 2000);
     });
 });
 
@@ -3659,6 +3681,19 @@ checkLicense();
 renderModeOptions();
 renderMenu();
 updateStartButton();
+
+// Auto-start fra URL-parameter (?code=...)
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+        // Fjern ?code= fra URL-en uten reload
+        window.history.replaceState({}, '', window.location.pathname);
+        // Sett koden i input og start
+        document.getElementById('game-code-input').value = code;
+        joinGameFromCode();
+    }
+})();
 </script>
 
 </body>
