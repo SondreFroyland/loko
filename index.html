@@ -2626,6 +2626,7 @@ async function tryEnterTeacherMode() {
         if (ok) {
             currentMode = 'teacher';
             renderModeOptions();
+            renderMenu();
         }
     } else {
         // Passord finnes – krever innlogging
@@ -2633,6 +2634,7 @@ async function tryEnterTeacherMode() {
         if (ok) {
             currentMode = 'teacher';
             renderModeOptions();
+            renderMenu();
         }
     }
 }
@@ -2668,6 +2670,7 @@ function renderModeOptions() {
             } else if (mode.id === 'student') {
                 currentMode = 'student';
                 renderModeOptions();
+                renderMenu();
             }
         });
         modeOptionsEl.appendChild(card);
