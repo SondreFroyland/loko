@@ -4229,7 +4229,7 @@ function renderMatchesList() {
 function renderUserGrid(justPlaced) {
     const lokoSection = userGrid.closest('.loko-section');
     if (lokoSection) {
-        lokoSection.style.display = (currentMode === 'teacher' || matchCount() >= 12 || isChecked) ? '' : 'none';
+        lokoSection.style.display = (currentMode === 'teacher' || isChecked) ? '' : 'none';
     }
 
     userGrid.innerHTML = '';
