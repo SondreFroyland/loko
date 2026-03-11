@@ -43,10 +43,12 @@
         }
 
         #menu h1 {
-            font-size: 3rem;
+            font-size: clamp(1.8rem, 8vw, 3rem);
             color: #1e40af;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             margin-bottom: 8px;
+            word-break: keep-all;
+            overflow-wrap: normal;
         }
 
         #menu .menu-subtitle {
@@ -176,10 +178,10 @@
         }
 
         .license-box h1 {
-            font-size: 2.8rem;
+            font-size: clamp(1.6rem, 7vw, 2.8rem);
             font-weight: 800;
             color: #1e3a8a;
-            letter-spacing: 6px;
+            letter-spacing: clamp(2px, 1vw, 6px);
             margin-bottom: 8px;
         }
 
@@ -740,7 +742,7 @@
 
 
         header h1 {
-            font-size: 2.4rem;
+            font-size: clamp(1.4rem, 6vw, 2.4rem);
             color: #1e40af;
             letter-spacing: 2px;
             margin-bottom: 4px;
@@ -1205,7 +1207,8 @@
             }
 
             #menu h1 {
-                font-size: 2.2rem;
+                font-size: clamp(1.6rem, 7vw, 2.2rem);
+                letter-spacing: 1px;
             }
 
             .theme-grid {
