@@ -2548,20 +2548,21 @@ function generateMathQuiz(op, difficulty) {
             answer = a * b;
         } else if (op === '÷') {
             if (difficulty === 'extreme') {
-                b = randInt(5, 30);
+                b = randInt(6, 30);
                 answer = randInt(5, 50);
             } else if (difficulty === 'vhard') {
-                b = randInt(3, 20);
+                b = randInt(4, 15);
                 answer = randInt(3, 25);
             } else if (difficulty === 'hard') {
-                b = randInt(2, 15);
-                answer = randInt(2, 20);
+                b = randInt(3, 12);
+                answer = randInt(2, 15);
             } else if (difficulty === 'medium') {
                 b = randInt(2, 10);
-                answer = randInt(1, 15);
+                answer = randInt(2, 10);
             } else {
-                b = randInt(2, 10);
-                answer = randInt(1, 15);
+                // Easy: små tall, maks 50 ÷ 5 = 10
+                b = randInt(2, 5);
+                answer = randInt(1, 10);
             }
             a = b * answer;
             question = `${a} ÷ ${b}`;
