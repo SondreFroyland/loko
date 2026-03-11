@@ -2116,6 +2116,7 @@ function updateQRCode() {
     const code = document.getElementById('game-code-display').textContent;
     if (!code) return;
     let url = window.location.origin + window.location.pathname + '?code=' + encodeURIComponent(code);
+    if (selectedImageId >= 0) url += '&img=' + selectedImageId;
     const storedLicense = getStoredLicense();
     if (storedLicense) url += '&license=' + encodeURIComponent(storedLicense);
     const canvas = document.getElementById('qr-canvas');
@@ -2918,9 +2919,10 @@ function playIncorrectSound() { playTone(220, 0.3); }
 // ============================================
 
 const TEACHER_PW_KEY = 'loko_teacher_password';
+const DEFAULT_TEACHER_PASSWORD = 'Mønstermatch26';
 
 function getStoredPassword() {
-    return localStorage.getItem(TEACHER_PW_KEY);
+    return localStorage.getItem(TEACHER_PW_KEY) || DEFAULT_TEACHER_PASSWORD;
 }
 
 function setStoredPassword(pw) {
@@ -3023,24 +3025,12 @@ passwordModal.addEventListener('click', (e) => {
 });
 
 async function tryEnterTeacherMode() {
-    const stored = getStoredPassword();
-
-    if (!stored) {
-        // Ingen passord satt ennå – opprett
-        const ok = await showPasswordModal('set');
-        if (ok) {
-            currentMode = 'teacher';
-            renderModeOptions();
-            renderMenu();
-        }
-    } else {
-        // Passord finnes – krever innlogging
-        const ok = await showPasswordModal('enter');
-        if (ok) {
-            currentMode = 'teacher';
-            renderModeOptions();
-            renderMenu();
-        }
+    // Alltid krev passord – standardpassord brukes hvis ingen er satt
+    const ok = await showPasswordModal('enter');
+    if (ok) {
+        currentMode = 'teacher';
+        renderModeOptions();
+        renderMenu();
     }
 }
 
@@ -3772,6 +3762,7 @@ function renderImagePicker() {
             renderImagePicker();
             renderRefGrid();
             renderUserGrid();
+            updateQRCode();
         });
         imagePickerRow.appendChild(thumb);
     });
@@ -4106,6 +4097,15 @@ updateStartButton();
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     if (code) {
+        // Sett bilde fra URL-parameter (?img=...)
+        const imgParam = params.get('img');
+        if (imgParam !== null) {
+            const imgIdx = parseInt(imgParam, 10);
+            if (!isNaN(imgIdx) && imgIdx >= 0 && imgIdx < defaultImages.length) {
+                selectedImageId = imgIdx;
+                puzzleImageUrl = defaultImages[imgIdx].url;
+            }
+        }
         // Fjern parametere fra URL-en uten reload
         window.history.replaceState({}, '', window.location.pathname);
         // Sett koden i input og start
