@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>LØKO</title>
+    <title>MønsterMatch</title>
     <style>
         /* ============================================
            RESET OG GRUNNSTILER
@@ -960,7 +960,7 @@
         }
 
         /* ============================================
-           LØKO-RUTENETT
+           MØNSTERMATCH-RUTENETT
            ============================================ */
         .loko-section {
             margin-bottom: 24px;
@@ -1436,7 +1436,7 @@
      ============================================ -->
 <div class="license-screen" id="license-screen">
     <div class="license-box">
-        <h1>LØKO</h1>
+        <h1>MønsterMatch</h1>
         <p class="license-subtitle">Skriv inn din lisenskode for å aktivere spillet</p>
         <input type="text" id="license-input" placeholder="LOKO-XXXXX-XXXXX-XXXXX" autocomplete="off" maxlength="22">
         <p class="license-error" id="license-error">&nbsp;</p>
@@ -1450,7 +1450,7 @@
      MENY / STARTSIDE
      ============================================ -->
 <div id="menu">
-    <h1>LØKO</h1>
+    <h1>MønsterMatch</h1>
     <p class="menu-subtitle">Velg modus og tema for å starte spillet</p>
 
     <div class="mode-section">
@@ -1495,7 +1495,7 @@
         <div class="back-row">
             <button class="back-btn" id="back-btn">&#8592; Velg tema</button>
         </div>
-        <h1>LØKO</h1>
+        <h1>MønsterMatch</h1>
         <p class="subtitle" id="game-subtitle"></p>
         <p class="instructions" id="game-instructions">Trykk på en oppgave, deretter på riktig svar for å lage en match.</p>
     </header>
@@ -1517,7 +1517,7 @@
         <div class="result-area" id="all-matched-msg"></div>
     </section>
 
-    <section class="loko-section" aria-label="LØKO-kontrollmønster">
+    <section class="loko-section" aria-label="MønsterMatch-kontrollmønster">
         <div class="loko-container">
             <div class="loko-grid-wrapper">
                 <h3>Ditt mønster</h3>
@@ -1763,7 +1763,7 @@ const QrCode = (function() {
     ];
 
     function getNumDataCodewords(ver, ecl) {
-        const totalCw = Math.floor(((16 * ver + 128) * ver + 64) / 8);
+        const totalCw = Math.floor(getNumRawDataModules(ver) / 8);
         return totalCw - ECC_CODEWORDS_PER_BLOCK[ecl][ver] * NUM_ERROR_CORRECTION_BLOCKS[ecl][ver];
     }
 
@@ -1981,13 +1981,16 @@ const QrCode = (function() {
         let rem = data;
         for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
         const bits = ((data << 10) | rem) ^ 0x5412;
-        for (let i = 0; i <= 5; i++) modules[8][i] = ((bits >>> i) & 1) !== 0;
-        modules[8][7] = ((bits >>> 6) & 1) !== 0;
+        // First copy
+        for (let i = 0; i <= 5; i++) modules[i][8] = ((bits >>> i) & 1) !== 0;
+        modules[7][8] = ((bits >>> 6) & 1) !== 0;
         modules[8][8] = ((bits >>> 7) & 1) !== 0;
-        modules[7][8] = ((bits >>> 8) & 1) !== 0;
-        for (let i = 9; i < 15; i++) modules[14 - i][8] = ((bits >>> i) & 1) !== 0;
-        for (let i = 0; i < 7; i++) modules[size - 1 - i][8] = ((bits >>> i) & 1) !== 0;
-        for (let i = 7; i < 15; i++) modules[8][size - 15 + i] = ((bits >>> i) & 1) !== 0;
+        modules[8][7] = ((bits >>> 8) & 1) !== 0;
+        for (let i = 9; i < 15; i++) modules[8][14 - i] = ((bits >>> i) & 1) !== 0;
+        // Second copy
+        for (let i = 0; i < 8; i++) modules[8][size - 1 - i] = ((bits >>> i) & 1) !== 0;
+        for (let i = 8; i < 15; i++) modules[size - 15 + i][8] = ((bits >>> i) & 1) !== 0;
+        modules[size - 8][8] = true; // Always dark
 
         if (version >= 7) {
             let rem2 = version;
@@ -2031,7 +2034,7 @@ const QrCode = (function() {
         let dark = 0;
         for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (modules[y][x]) dark++;
         const total = size * size;
-        const k = Math.abs(Math.ceil(dark * 20 / total) - 10);
+        const k = Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1;
         penalty += k * 10;
         return penalty;
     }
