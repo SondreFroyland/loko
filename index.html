@@ -66,6 +66,7 @@
             color: #1e293b;
             min-height: 100vh;
             line-height: 1.5;
+            padding-top: env(safe-area-inset-top);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
             padding-bottom: env(safe-area-inset-bottom);
@@ -1578,8 +1579,7 @@
     <div class="game-code-section">
         <p class="game-code-divider">— eller —</p>
         <button class="scan-qr-btn" id="scan-qr-btn">📷 Skann QR-kode</button>
-        <p style="font-size:0.8rem;color:#94a3b8;margin-top:12px;margin-bottom:8px;">Eller skriv inn koden manuelt:</p>
-        <div class="game-code-input-row">
+        <div class="game-code-input-row" style="display:none;">
             <input type="text" id="game-code-input" placeholder="XXX-XXXX" maxlength="500" autocomplete="off">
             <button class="btn btn-primary" id="join-game-btn">Spill</button>
         </div>
