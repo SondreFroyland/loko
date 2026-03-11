@@ -4,13 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MønsterMatch</title>
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MønsterMatch">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <script>
+    // Dynamisk manifest: bak lisens inn i start_url slik at
+    // PWA på hjemskjermen alltid åpner med lisensen i URL-en
+    (function() {
+        var license = localStorage.getItem('loko_license') || '';
+        var params = new URLSearchParams(window.location.search);
+        var urlLicense = params.get('license');
+        if (urlLicense) license = urlLicense;
+        var startUrl = './index.html';
+        if (license) startUrl += '?license=' + encodeURIComponent(license);
+        var manifest = {
+            name: 'MønsterMatch',
+            short_name: 'MønsterMatch',
+            description: 'Pedagogisk puslespill for matching av mønstre',
+            start_url: startUrl,
+            scope: './',
+            display: 'standalone',
+            orientation: 'any',
+            theme_color: '#6366f1',
+            background_color: '#f0f4f8',
+            icons: [
+                { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+                { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+            ]
+        };
+        var blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        var link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+    })();
+    </script>
     <style>
         /* ============================================
            RESET OG GRUNNSTILER
