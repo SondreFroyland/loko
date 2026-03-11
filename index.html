@@ -2560,9 +2560,9 @@ function generateMathQuiz(op, difficulty) {
                 b = randInt(2, 10);
                 answer = randInt(2, 10);
             } else {
-                // Easy: små tall, maks 50 ÷ 5 = 10
+                // Easy: enkle delestykker, svar 1-12
                 b = randInt(2, 5);
-                answer = randInt(1, 10);
+                answer = randInt(1, 12);
             }
             a = b * answer;
             question = `${a} ÷ ${b}`;
@@ -2576,10 +2576,18 @@ function generateMathQuiz(op, difficulty) {
         }
     }
 
-    // Sikkerhetsnett: Fyll opp til 12 hvis nødvendig
+    // Sikkerhetsnett: Fyll opp med enkle oppgaver hvis ikke nok unike
+    let fallbackN = 50;
     while (items.length < 12) {
-        const fallback = items.length + 100;
-        items.push({ question: `? ${op} ?`, answer: String(fallback) });
+        fallbackN++;
+        const answerStr = String(fallbackN);
+        if (!usedAnswers.has(answerStr)) {
+            usedAnswers.add(answerStr);
+            if (op === '+') items.push({ question: `${fallbackN} + 0`, answer: answerStr });
+            else if (op === '−') items.push({ question: `${fallbackN} − 0`, answer: answerStr });
+            else if (op === '×') items.push({ question: `${fallbackN} × 1`, answer: answerStr });
+            else if (op === '÷') items.push({ question: `${fallbackN} ÷ 1`, answer: answerStr });
+        }
     }
 
     return items;
