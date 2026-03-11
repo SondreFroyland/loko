@@ -2115,7 +2115,9 @@ function renderQRToCanvas(canvas, qr) {
 function updateQRCode() {
     const code = document.getElementById('game-code-display').textContent;
     if (!code) return;
-    const url = window.location.origin + window.location.pathname + '?code=' + encodeURIComponent(code);
+    let url = window.location.origin + window.location.pathname + '?code=' + encodeURIComponent(code);
+    const storedLicense = getStoredLicense();
+    if (storedLicense) url += '&license=' + encodeURIComponent(storedLicense);
     const canvas = document.getElementById('qr-canvas');
     try {
         const qr = QrCode.encode(url, 0); // 0 = LOW error correction
@@ -4084,6 +4086,16 @@ window.addEventListener('orientationchange', () => {
 // ============================================
 generateAllDefaultImages();
 puzzleImageUrl = defaultImages[0].url;
+
+// Auto-lisens fra URL-parameter (?license=...)
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const licenseParam = params.get('license');
+    if (licenseParam && validateLicenseKey(licenseParam)) {
+        setStoredLicense(licenseParam);
+    }
+})();
+
 checkLicense();
 renderModeOptions();
 renderMenu();
@@ -4094,7 +4106,7 @@ updateStartButton();
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     if (code) {
-        // Fjern ?code= fra URL-en uten reload
+        // Fjern parametere fra URL-en uten reload
         window.history.replaceState({}, '', window.location.pathname);
         // Sett koden i input og start
         document.getElementById('game-code-input').value = code;
