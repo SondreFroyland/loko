@@ -11,13 +11,21 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <script>
-    // Dynamisk manifest: bak lisens inn i start_url slik at
-    // PWA på hjemskjermen alltid åpner med lisensen i URL-en
+    // Dynamisk manifest + cookie-backup for lisens
+    // Cookie deles mellom Safari og PWA på iOS, localStorage gjør det ikke
     (function() {
-        var license = localStorage.getItem('loko_license') || '';
         var params = new URLSearchParams(window.location.search);
         var urlLicense = params.get('license');
-        if (urlLicense) license = urlLicense;
+        // Prioritet: URL-param > localStorage > cookie
+        var license = urlLicense
+            || localStorage.getItem('loko_license')
+            || (document.cookie.match(/loko_license=([^;]+)/) || [])[1]
+            || '';
+        // Lagre i alle tre for robusthet
+        if (license) {
+            try { localStorage.setItem('loko_license', license); } catch(e) {}
+            document.cookie = 'loko_license=' + license + ';path=/;max-age=31536000;SameSite=Lax';
+        }
         var startUrl = './index.html';
         if (license) startUrl += '?license=' + encodeURIComponent(license);
         var manifest = {
@@ -1677,11 +1685,20 @@ function generateLicenseKey() {
 }
 
 function getStoredLicense() {
-    return localStorage.getItem(LICENSE_STORAGE_KEY);
+    var ls = localStorage.getItem(LICENSE_STORAGE_KEY);
+    if (ls) return ls;
+    // Fallback: les fra cookie (deles mellom Safari og PWA på iOS)
+    var match = document.cookie.match(/loko_license=([^;]+)/);
+    if (match) {
+        localStorage.setItem(LICENSE_STORAGE_KEY, match[1]);
+        return match[1];
+    }
+    return null;
 }
 
 function setStoredLicense(key) {
     localStorage.setItem(LICENSE_STORAGE_KEY, key);
+    document.cookie = 'loko_license=' + key + ';path=/;max-age=31536000;SameSite=Lax';
 }
 
 function checkLicense() {
