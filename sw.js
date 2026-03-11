@@ -1,22 +1,11 @@
-const CACHE_NAME = 'monstermatch-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+const CACHE_NAME = 'monstermatch-v2';
 
-// Install: pre-cache all assets
+// Install: ta over umiddelbart
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: slett gamle cacher og ta kontroll
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -28,24 +17,42 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: cache-first, then network (stale-while-revalidate)
+// Fetch: network-first for HTML, stale-while-revalidate for resten
 self.addEventListener('fetch', event => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      // Return cached version immediately
-      const fetchPromise = fetch(event.request).then(response => {
-        // Update cache with fresh version in background
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => cached); // If network fails, fall back to cache
+  const url = new URL(event.request.url);
+  const isHTML = event.request.destination === 'document'
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('/');
 
-      return cached || fetchPromise;
-    })
-  );
+  if (isHTML) {
+    // Network-first for HTML: alltid hent nyeste versjon
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    // Stale-while-revalidate for andre ressurser (ikoner, manifest, jsQR)
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        const fetchPromise = fetch(event.request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        }).catch(() => cached);
+
+        return cached || fetchPromise;
+      })
+    );
+  }
 });

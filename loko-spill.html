@@ -4383,9 +4383,23 @@ updateStartButton();
     }
 })();
 
-// Registrer Service Worker for PWA-støtte
+// Registrer Service Worker for PWA-støtte med auto-oppdatering
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').then(reg => {
+        // Sjekk for oppdateringer regelmessig (hvert 60. sekund)
+        setInterval(() => reg.update(), 60000);
+        // Når ny SW er klar: aktiver og reload for å vise siste versjon
+        reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            if (newSW) {
+                newSW.addEventListener('statechange', () => {
+                    if (newSW.state === 'activated' && navigator.serviceWorker.controller) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+    }).catch(() => {});
 }
 </script>
 
