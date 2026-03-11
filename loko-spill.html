@@ -349,6 +349,65 @@
             margin-top: 6px;
         }
 
+        .scan-qr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 12px auto 8px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+        .scan-qr-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(99,102,241,0.4);
+        }
+        .scan-qr-btn:active {
+            transform: translateY(0);
+        }
+
+        .qr-scanner-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-scanner-overlay.hidden { display: none; }
+        .qr-scanner-video {
+            width: 90vw;
+            max-width: 400px;
+            border-radius: 16px;
+            border: 3px solid #6366f1;
+        }
+        .qr-scanner-label {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .qr-scanner-close {
+            margin-top: 20px;
+            padding: 10px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background: #ef4444;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
         .game-code-banner {
             background: linear-gradient(135deg, #1e3a5f, #2563eb);
             color: #fff;
@@ -1518,14 +1577,22 @@
 
     <div class="game-code-section">
         <p class="game-code-divider">— eller —</p>
-        <p class="game-code-label">Har du en spillkode?</p>
-        <p style="font-size:0.8rem;color:#94a3b8;margin-bottom:8px;">Lim inn koden du fikk fra læreren din her</p>
+        <button class="scan-qr-btn" id="scan-qr-btn">📷 Skann QR-kode</button>
+        <p style="font-size:0.8rem;color:#94a3b8;margin-top:12px;margin-bottom:8px;">Eller skriv inn koden manuelt:</p>
         <div class="game-code-input-row">
             <input type="text" id="game-code-input" placeholder="XXX-XXXX" maxlength="500" autocomplete="off">
             <button class="btn btn-primary" id="join-game-btn">Spill</button>
         </div>
         <p class="game-code-error hidden" id="game-code-error"></p>
     </div>
+</div>
+
+<!-- QR-SCANNER OVERLAY -->
+<div class="qr-scanner-overlay hidden" id="qr-scanner-overlay">
+    <p class="qr-scanner-label">Hold kameraet over QR-koden</p>
+    <video class="qr-scanner-video" id="qr-scanner-video" autoplay playsinline></video>
+    <canvas id="qr-scanner-canvas" style="display:none;"></canvas>
+    <button class="qr-scanner-close" id="qr-scanner-close">Avbryt</button>
 </div>
 
 <!-- ============================================
@@ -4170,6 +4237,114 @@ updateStartButton();
         document.getElementById('game-code-input').value = code;
         joinGameFromCode();
     }
+})();
+
+// ============================================
+// QR-SCANNER (innebygd kamera-skanner)
+// ============================================
+(function() {
+    const scanBtn = document.getElementById('scan-qr-btn');
+    const overlay = document.getElementById('qr-scanner-overlay');
+    const video = document.getElementById('qr-scanner-video');
+    const canvas = document.getElementById('qr-scanner-canvas');
+    const closeBtn = document.getElementById('qr-scanner-close');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let stream = null;
+    let scanning = false;
+
+    // Sjekk om BarcodeDetector er tilgjengelig (Safari 16.4+, Chrome, Edge)
+    const hasBarcodeDetector = typeof BarcodeDetector !== 'undefined';
+    let detector = null;
+    if (hasBarcodeDetector) {
+        detector = new BarcodeDetector({ formats: ['qr_code'] });
+    }
+
+    function stopScanner() {
+        scanning = false;
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+            stream = null;
+        }
+        video.srcObject = null;
+        overlay.classList.add('hidden');
+    }
+
+    function handleQrResult(url) {
+        stopScanner();
+        try {
+            const parsed = new URL(url);
+            const params = new URLSearchParams(parsed.search);
+            // Hent lisens fra URL og lagre
+            const license = params.get('license');
+            if (license && validateLicenseKey(license)) {
+                setStoredLicense(license);
+                checkLicense();
+            }
+            // Hent spillkode og start
+            const code = params.get('code');
+            if (code) {
+                // Hent bilde fra URL
+                const imgParam = params.get('img');
+                if (imgParam !== null) {
+                    const imgIdx = parseInt(imgParam, 10);
+                    if (!isNaN(imgIdx) && imgIdx >= 0 && imgIdx < defaultImages.length) {
+                        selectedImageId = imgIdx;
+                        puzzleImageUrl = defaultImages[imgIdx].url;
+                    }
+                }
+                document.getElementById('game-code-input').value = code;
+                joinGameFromCode();
+            }
+        } catch (e) {
+            // Ikke en gyldig URL, prøv som ren spillkode
+            document.getElementById('game-code-input').value = url;
+            joinGameFromCode();
+        }
+    }
+
+    async function scanFrame() {
+        if (!scanning) return;
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+            requestAnimationFrame(scanFrame);
+            return;
+        }
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+
+        if (detector) {
+            try {
+                const barcodes = await detector.detect(canvas);
+                if (barcodes.length > 0) {
+                    handleQrResult(barcodes[0].rawValue);
+                    return;
+                }
+            } catch (e) {}
+        }
+        requestAnimationFrame(scanFrame);
+    }
+
+    scanBtn.addEventListener('click', async () => {
+        if (!hasBarcodeDetector) {
+            alert('QR-skanning støttes ikke i denne nettleseren. Bruk kamera-appen til å skanne, eller skriv inn koden manuelt.');
+            return;
+        }
+        overlay.classList.remove('hidden');
+        scanning = true;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+            });
+            video.srcObject = stream;
+            video.play();
+            scanFrame();
+        } catch (e) {
+            stopScanner();
+            alert('Kunne ikke åpne kameraet. Sjekk at appen har tilgang til kamera.');
+        }
+    });
+
+    closeBtn.addEventListener('click', stopScanner);
 })();
 
 // Registrer Service Worker for PWA-støtte
