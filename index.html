@@ -222,6 +222,8 @@
             font-weight: 800;
             color: #1e3a8a;
             letter-spacing: clamp(2px, 1vw, 6px);
+            text-indent: clamp(2px, 1vw, 6px);
+            text-align: center;
             margin-bottom: 8px;
         }
 
@@ -233,6 +235,7 @@
 
         .license-input {
             width: 100%;
+            box-sizing: border-box;
             padding: 14px 16px;
             font-size: 1.1rem;
             font-family: 'Courier New', monospace;
@@ -1547,7 +1550,7 @@
     <div class="license-box">
         <h1>MønsterMatch</h1>
         <p class="license-subtitle">Skriv inn din lisenskode for å aktivere spillet</p>
-        <input type="text" id="license-input" placeholder="LOKO-XXXXX-XXXXX-XXXXX" autocomplete="off" maxlength="22">
+        <input type="text" id="license-input" class="license-input" placeholder="LOKO-XXXXX-XXXXX-XXXXX" autocomplete="off" maxlength="22">
         <p class="license-error" id="license-error">&nbsp;</p>
         <p class="license-success hidden" id="license-success"></p>
         <button class="license-btn" id="license-activate-btn">Aktiver</button>
@@ -1740,15 +1743,6 @@ function validateLicenseKey(key) {
         if (_C.indexOf(base[i]) === -1) return false;
     }
     return _computeChecksum(base) === check;
-}
-
-function generateLicenseKey() {
-    let base = '';
-    for (let i = 0; i < 10; i++) {
-        base += _C[Math.floor(Math.random() * _C.length)];
-    }
-    const check = _computeChecksum(base);
-    return 'LOKO-' + base.substring(0, 5) + '-' + base.substring(5, 10) + '-' + check;
 }
 
 function getStoredLicense() {
