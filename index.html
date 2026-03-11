@@ -52,6 +52,37 @@
     </script>
     <style>
         /* ============================================
+           CSS CUSTOM PROPERTIES (LYS / MØRK MODUS)
+           ============================================ */
+        :root {
+            --bg: #f0f4f8;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --title: #1e40af;
+            --accent: #3b82f6;
+            --accent-light: #dbeafe;
+            --card-shadow: rgba(0,0,0,0.08);
+            --toolbar-bg: rgba(255,255,255,0.85);
+        }
+
+        html[data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --title: #93c5fd;
+            --accent: #3b82f6;
+            --accent-light: #1e3a5f;
+            --card-shadow: rgba(0,0,0,0.4);
+            --toolbar-bg: rgba(15,23,42,0.85);
+        }
+
+        /* ============================================
            RESET OG GRUNNSTILER
            ============================================ */
         *, *::before, *::after {
@@ -62,8 +93,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-            background: #f0f4f8;
-            color: #1e293b;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             line-height: 1.5;
             padding-top: env(safe-area-inset-top);
@@ -84,7 +115,7 @@
 
         #menu h1 {
             font-size: clamp(1.8rem, 8vw, 3rem);
-            color: #1e40af;
+            color: var(--title);
             letter-spacing: 2px;
             margin-bottom: 8px;
             word-break: keep-all;
@@ -93,7 +124,7 @@
 
         #menu .menu-subtitle {
             font-size: 1.15rem;
-            color: #64748b;
+            color: var(--text-muted);
             margin-bottom: 36px;
         }
 
@@ -105,8 +136,8 @@
         }
 
         .theme-card {
-            background: #fff;
-            border: 2px solid #e2e8f0;
+            background: var(--surface);
+            border: 2px solid var(--border);
             border-radius: 14px;
             padding: 24px 16px;
             cursor: pointer;
@@ -116,8 +147,8 @@
 
 
         .theme-card.selected {
-            border-color: #3b82f6;
-            background: #dbeafe;
+            border-color: var(--accent);
+            background: var(--accent-light);
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
 
@@ -129,13 +160,13 @@
 
         .theme-card h3 {
             font-size: 1.05rem;
-            color: #1e293b;
+            color: var(--text);
             margin-bottom: 4px;
         }
 
         .theme-card p {
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         /* Modusvelger */
@@ -145,7 +176,7 @@
 
         .mode-section h3 {
             font-size: 1rem;
-            color: #475569;
+            color: var(--text-secondary);
             margin-bottom: 12px;
         }
 
@@ -156,8 +187,8 @@
         }
 
         .mode-card {
-            background: #fff;
-            border: 2px solid #e2e8f0;
+            background: var(--surface);
+            border: 2px solid var(--border);
             border-radius: 12px;
             padding: 20px 28px;
             cursor: pointer;
@@ -168,8 +199,8 @@
 
 
         .mode-card.selected {
-            border-color: #3b82f6;
-            background: #dbeafe;
+            border-color: var(--accent);
+            background: var(--accent-light);
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
 
@@ -181,13 +212,13 @@
 
         .mode-card h4 {
             font-size: 1rem;
-            color: #1e293b;
+            color: var(--text);
             margin-bottom: 2px;
         }
 
         .mode-card p {
             font-size: 0.8rem;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         /* Lisensskjerm */
@@ -208,7 +239,7 @@
         }
 
         .license-box {
-            background: #fff;
+            background: var(--surface);
             border-radius: 20px;
             padding: 48px 40px;
             max-width: 440px;
@@ -229,7 +260,7 @@
 
         .license-box .license-subtitle {
             font-size: 0.95rem;
-            color: #64748b;
+            color: var(--text-muted);
             margin-bottom: 28px;
         }
 
@@ -240,12 +271,14 @@
             font-size: 1.1rem;
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border);
             border-radius: 10px;
             text-align: center;
             outline: none;
             transition: border-color 0.2s;
             text-transform: uppercase;
+            background: var(--surface);
+            color: var(--text);
         }
 
         .license-input:focus {
@@ -1539,9 +1572,252 @@
             from { opacity: 0; transform: translateX(-10px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
+        /* ============================================
+           INNSTILLINGSVERKTØYLINJE (LYD + MØRK MODUS)
+           ============================================ */
+        #settings-toolbar {
+            position: fixed;
+            top: 12px;
+            right: 14px;
+            z-index: 9999;
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            border-radius: 10px;
+            background: var(--toolbar-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 2px 8px var(--card-shadow);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .toolbar-btn:active { transform: scale(0.92); }
+
+        /* ============================================
+           STATISTIKK-SEKSJON I MENY
+           ============================================ */
+        .stats-section {
+            margin-top: 32px;
+            text-align: left;
+        }
+
+        .stats-section summary {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .stats-section summary::-webkit-details-marker { display: none; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .stats-reset-link {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* ============================================
+           POENGVISNING I RESULTAT
+           ============================================ */
+        .score-display {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           MØRK MODUS - BREDE OVERRIDES FOR SPILLELEMENTER
+           ============================================ */
+        html[data-theme="dark"] .game-section,
+        html[data-theme="dark"] #menu {
+            background: var(--bg);
+        }
+
+        html[data-theme="dark"] .item {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .item.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        html[data-theme="dark"] .item.correct {
+            background: #14532d;
+            border-color: #22c55e;
+        }
+
+        html[data-theme="dark"] .item.incorrect {
+            background: #7f1d1d;
+            border-color: #ef4444;
+        }
+
+        html[data-theme="dark"] .item.active {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        html[data-theme="dark"] .diff-btn {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
+
+        html[data-theme="dark"] .diff-btn.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--title);
+        }
+
+        html[data-theme="dark"] .difficulty-section h3 {
+            color: var(--text-secondary);
+        }
+
+        html[data-theme="dark"] .modal-box {
+            background: var(--surface);
+        }
+
+        html[data-theme="dark"] .modal-box h3,
+        html[data-theme="dark"] .modal-box .modal-desc {
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .modal-box input[type="password"] {
+            background: var(--bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .modal-btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .custom-theme-editor {
+            background: var(--bg);
+        }
+
+        html[data-theme="dark"] .editor-container {
+            background: var(--surface);
+        }
+
+        html[data-theme="dark"] .editor-header h2,
+        html[data-theme="dark"] .editor-form label {
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .editor-name-input,
+        html[data-theme="dark"] .pair-input {
+            background: var(--bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .emoji-option {
+            background: var(--surface);
+            border-color: var(--border);
+        }
+
+        html[data-theme="dark"] .emoji-option.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        html[data-theme="dark"] .progress-bar {
+            background: var(--border);
+        }
+
+        html[data-theme="dark"] .game-subtitle,
+        html[data-theme="dark"] .back-btn,
+        html[data-theme="dark"] #game-title {
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .ref-grid-label,
+        html[data-theme="dark"] .matches-list-label {
+            color: var(--text-muted);
+        }
+
+        html[data-theme="dark"] .item:active:not(.disabled) {
+            background: var(--accent-light);
+        }
+
+        html[data-theme="dark"] .editor-actions {
+            border-top-color: var(--border);
+        }
+
+        html[data-theme="dark"] .game-code-input-row input {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .license-box h1 {
+            color: var(--title);
+        }
     </style>
 </head>
 <body>
+
+<!-- ============================================
+     INNSTILLINGSVERKTØYLINJE
+     ============================================ -->
+<div id="settings-toolbar">
+    <button class="toolbar-btn" id="mute-btn" onclick="toggleMute()" title="Lyd av/på">🔊</button>
+    <button class="toolbar-btn" id="darkmode-btn" onclick="toggleDarkMode()" title="Mørk modus">🌙</button>
+</div>
 
 <!-- ============================================
      LISENSSKJERM
@@ -2960,6 +3236,75 @@ let shuffledAnswerIndices = [];
 let lockedMatches = new Set();
 
 // ============================================
+// LYD OG MØRK MODUS
+// ============================================
+let isMuted = localStorage.getItem('loko_muted') === 'true';
+let isDark = localStorage.getItem('loko_dark') === 'true';
+
+function applyTheme() {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    const btn = document.getElementById('darkmode-btn');
+    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+}
+
+function toggleMute() {
+    isMuted = !isMuted;
+    localStorage.setItem('loko_muted', isMuted);
+    const btn = document.getElementById('mute-btn');
+    if (btn) btn.textContent = isMuted ? '🔇' : '🔊';
+}
+
+function toggleDarkMode() {
+    isDark = !isDark;
+    localStorage.setItem('loko_dark', isDark);
+    applyTheme();
+}
+
+// Apply theme and mute state on load
+applyTheme();
+(function() {
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) muteBtn.textContent = isMuted ? '🔇' : '🔊';
+})();
+
+// ============================================
+// POENG OG STATISTIKK - GLOBALS
+// ============================================
+let gameStartTime = null;
+let retryCount = 0;
+let statsUpdatedThisGame = false;
+
+const STATS_KEY = 'loko_stats';
+
+function getStats() {
+    try { return JSON.parse(localStorage.getItem(STATS_KEY) || '{}'); } catch(e) { return {}; }
+}
+
+function saveStats(s) {
+    localStorage.setItem(STATS_KEY, JSON.stringify(s));
+}
+
+function updateStats(correctCount, score, elapsed) {
+    const s = getStats();
+    s.gamesPlayed = (s.gamesPlayed || 0) + 1;
+    s.totalCorrect = (s.totalCorrect || 0) + correctCount;
+    s.bestScore = Math.max(s.bestScore || 0, score);
+    s.totalTimeSec = (s.totalTimeSec || 0) + elapsed;
+    if (correctCount === 12) {
+        s.perfectGames = (s.perfectGames || 0) + 1;
+        if (s.fastestTime == null || elapsed < s.fastestTime) s.fastestTime = elapsed;
+    }
+    saveStats(s);
+}
+
+function resetStats() {
+    if (confirm('Nullstill all statistikk?')) {
+        localStorage.removeItem(STATS_KEY);
+        renderMenu();
+    }
+}
+
+// ============================================
 // DOM-REFERANSER
 // ============================================
 
@@ -3046,6 +3391,7 @@ function showToast(message) {
 let _toastShownAt6 = false;
 
 function playTone(frequency, duration) {
+    if (isMuted) return;
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = ctx.createOscillator();
@@ -3463,6 +3809,43 @@ function renderMenu() {
         createCard.addEventListener('click', () => openCustomThemeEditor());
         themeGridEl.appendChild(createCard);
     }
+
+    // Statistikk-seksjon
+    const menuEl2 = document.getElementById('menu');
+    let statsSection = document.getElementById('stats-section');
+    if (!statsSection) {
+        statsSection = document.createElement('details');
+        statsSection.id = 'stats-section';
+        statsSection.className = 'stats-section';
+        menuEl2.appendChild(statsSection);
+    }
+
+    const s = getStats();
+    const gamesPlayed = s.gamesPlayed || 0;
+    const fastestTime = s.fastestTime != null ? `${s.fastestTime} sek` : '–';
+
+    statsSection.innerHTML = `
+        <summary>📊 Min statistikk</summary>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value">${gamesPlayed}</span>
+                <div class="stat-label">Spilte runder</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${s.perfectGames || 0}</span>
+                <div class="stat-label">Perfekte runder</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${s.bestScore || 0}</span>
+                <div class="stat-label">Beste poeng</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${fastestTime}</span>
+                <div class="stat-label">Raskeste tid (12/12)</div>
+            </div>
+        </div>
+        <span class="stats-reset-link" onclick="resetStats()">Nullstill statistikk</span>
+    `;
 }
 
 function updateDifficultySection() {
@@ -3548,6 +3931,9 @@ function startGame(fromCode = false, codeData = null) {
 
     gameSubtitleEl.textContent = subtitle;
     showScreen('game');
+    gameStartTime = Date.now();
+    retryCount = 0;
+    statsUpdatedThisGame = false;
     initGame();
 
     // Vis spillkode-banner med QR-kode for lærere
@@ -3992,6 +4378,21 @@ function checkAnswers() {
         if (matches[i] === i) correct++;
     }
 
+    // Beregn poeng
+    const elapsed = gameStartTime ? Math.round((Date.now() - gameStartTime) / 1000) : 0;
+    const wrongCount = 12 - correct;
+    const baseScore = correct * 100;
+    const timePenalty = Math.min(elapsed * 2, 400);
+    const wrongPenalty = wrongCount * 30;
+    const retryPenalty = retryCount * 80;
+    const score = Math.max(0, baseScore - timePenalty - wrongPenalty - retryPenalty);
+
+    // Oppdater statistikk (kun én gang per spill)
+    if (!statsUpdatedThisGame) {
+        statsUpdatedThisGame = true;
+        updateStats(correct, score, elapsed);
+    }
+
     const msg = document.createElement('div');
     msg.className = 'result-message';
 
@@ -4010,8 +4411,14 @@ function checkAnswers() {
         playIncorrectSound();
     }
 
+    // Vis poeng og tid
+    const scoreEl = document.createElement('div');
+    scoreEl.className = 'score-display';
+    scoreEl.textContent = `⭐ ${score} poeng  •  ⏱ ${elapsed} sek`;
+
     resultArea.innerHTML = '';
     resultArea.appendChild(msg);
+    resultArea.appendChild(scoreEl);
 
     // Vis "Prøv igjen"-knapp hvis ikke alle er riktige
     if (correct < 12) {
@@ -4027,6 +4434,7 @@ function checkAnswers() {
 }
 
 function retryWrongAnswers() {
+    retryCount++;
     // Lås riktige matcher og fjern feil
     for (let i = 0; i < 12; i++) {
         if (matches[i] === i) {
@@ -4050,6 +4458,9 @@ function retryWrongAnswers() {
 
 function resetGame() {
     lockedMatches = new Set();
+    gameStartTime = Date.now();
+    retryCount = 0;
+    statsUpdatedThisGame = false;
     initGame();
 }
 
